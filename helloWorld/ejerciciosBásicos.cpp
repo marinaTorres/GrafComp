@@ -1,7 +1,7 @@
 /*********************************************************
 Materia: Gráficas Computacionales
 Fecha: 14 de agosto del 2017
-Autor: A01375051 Marina Fernanda Torres Gómez
+Autor: A01375051 Marina Fernanda Torres Góme
 *********************************************************/
 
 #include <iostream>
