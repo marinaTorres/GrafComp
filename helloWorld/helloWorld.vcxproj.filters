@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Archivos de código fuente">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Archivos de encabezado">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Archivos de recursos">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Archivos de recursos\Shaders">
+      <UniqueIdentifier>{044db4bc-f91f-40cc-a11f-3098345890f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Tarea 2">
+      <UniqueIdentifier>{7b0f35ef-bba1-4d49-a7fd-d3fd585076a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Tarea 3">
+      <UniqueIdentifier>{fc2bdf83-cfd9-4bb2-bcd4-678a1814a348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de recursos\Tarea 2">
+      <UniqueIdentifier>{41946727-b1c0-44e2-9f20-97a7e5fb336b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de recursos\Tarea 3">
+      <UniqueIdentifier>{c5e8a023-e0f0-46d2-bac5-26b9ef28bed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de recursos\Tarea 1">
+      <UniqueIdentifier>{babf29ba-36d2-475d-9b20-6d94d4b38a3b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Circle.h">
+      <Filter>Archivos de encabezado\Tarea 2</Filter>
+    </ClInclude>
+    <ClInclude Include="Employee.h">
+      <Filter>Archivos de encabezado\Tarea 2</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>Archivos de encabezado\Tarea 2</Filter>
+    </ClInclude>
+    <ClInclude Include="inputFile.h">
+      <Filter>Archivos de encabezado\Tarea 3</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Circle.cpp">
+      <Filter>Archivos de recursos\Tarea 2</Filter>
+    </ClCompile>
+    <ClCompile Include="Employee.cpp">
+      <Filter>Archivos de recursos\Tarea 2</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangle.cpp">
+      <Filter>Archivos de recursos\Tarea 2</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Archivos de recursos</Filter>
+    </ClCompile>
+    <ClCompile Include="inputFile.cpp">
+      <Filter>Archivos de recursos\Tarea 3</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Default.frag">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Default.vert">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
