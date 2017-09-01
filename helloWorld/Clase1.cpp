@@ -12,7 +12,7 @@ int main1() {
 	Rectangle rectangulo(5, 6);
 	cout << rectangulo.getArea() << endl;
 	cout << "Cambiando la base a 10" << endl;
-	rectangulo.setWidth(10);
+	rectangulo.setWith(10);
 	cout << rectangulo.getPerimeter() << endl;
 
 	Employee empleado(123, "Adalberto", "Gutierritos", 1080);
