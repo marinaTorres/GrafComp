@@ -69,7 +69,7 @@ void Initialise() {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// Desactivamos el manager
+	// Desactivamos el manager vao
 	glBindVertexArray(0);
 
 	// Creamos un objeto para leer archivos
@@ -125,6 +125,20 @@ void GameLoop() {
 
 	// Activamos el vertexShader y el fragmentShader utilizando el manager
 	glUseProgram(shaderProgram);
+
+	// Activamos el manager y en este momento se activan todos los VBOs asociados automáticamente
+	glBindVertexArray(vao);
+	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	// Terminamos de utilizar el manager vao
+	glBindVertexArray(0);
+
+	// Desactivamos el manager shaderProgram
+	glUseProgram(0);
+
+	//Cuando terminamos de renderear, cambiamos los buffers
+	glutSwapBuffers();
+	
 	/*
 	// WARNING!!!!!! ESTO ES OPENGL VIEJITO!!!!!!
 
@@ -141,19 +155,6 @@ void GameLoop() {
 	glVertex2d(0.0f, 1.0f);
 
 	glEnd();*/
-
-	// Activamos el manager y en este momento se activan todos los VBOs asociados automáticamente
-	glBindVertexArray(vao);
-	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	// Terminamos de utilizar el manager
-	glBindVertexArray(0);
-
-	// Desactivamos el manager
-	glUseProgram(0);
-
-	//Cuando terminamos de renderear, cambiamos los buffers
-	glutSwapBuffers();
 }
 
 int main(int argc, char* argv[]) {
@@ -168,7 +169,7 @@ int main(int argc, char* argv[]) {
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
 	// Freeglut nos permite configurar eventos que ocurren en la ventana
-	// Un evento que interesa es cuando alguien cierra la centana
+	// Un evento que interesa es cuando alguien cierra la ventana
 	// En este caso, se deja de renderear la escena y se termina el programa
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
