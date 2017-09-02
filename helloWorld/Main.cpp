@@ -1,7 +1,7 @@
 /*********************************************************
 Materia: Gráficas Computacionales
 Fecha: 18 de agosto del 2017
-Autor: A01169073 Aldo A. Reyna Gómez
+Autor: A01375051 Marina Fernanda Torres Gómez
 *********************************************************/
 
 #include <GL/glew.h>
