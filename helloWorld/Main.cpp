@@ -13,9 +13,10 @@ Autor: A01375051 Marina Fernanda Torres Gómez
 
 using namespace std;
 using namespace glm;
-
+/*++createMesh inicio++*/
 // Identificadoe del manager al que vamos a asociar todos los VOBs que tenga nuestra geometría
 GLuint vao;
+/*++createMesh fin++*/
 
 // Identificador del manager de los shaders (shaderProgramme)
 GLuint shaderProgram;
@@ -25,11 +26,15 @@ void Initialise() {
 	// Vector de C++ es una lista de elementos, vector de glm es una matriz con muchos componentes
 	// Lista de vec2
 	// Claramente estamos trabajando en el CPU y RAM
+
+	/*++setpositionatribute inicio++*/
 	vector<vec2> positions;
 	positions.push_back(vec2(0.5f, -0.5f));
 	positions.push_back(vec2(0.5f, 0.5f));
 	positions.push_back(vec2(-0.5f, -0.5f));
 	positions.push_back(vec2(-0.5f, 0.5f));
+	/*++fin++*/
+
 
 	vector<vec3> colors;
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
@@ -39,6 +44,8 @@ void Initialise() {
 	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
 	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
 
+
+	/*++ SetAttributeData(…) inicio++*/
 	// Queremos gengerar 1 manager
 	glGenVertexArrays(1, &vao);
 	// Utilizar el vao
@@ -71,7 +78,10 @@ void Initialise() {
 
 	// Desactivamos el manager vao
 	glBindVertexArray(0);
+	/*++Fin++*/
 
+
+	/*++Clase shades inicio++*/
 	// Creamos un objeto para leer archivos
 	inputFile myfile;
 
@@ -101,6 +111,7 @@ void Initialise() {
 	// Continuar leyendo hasta que encuentre un nullptr
 	glShaderSource(fragmentShaderHandle, 1, &fragmentSource_c, nullptr);
 	glCompileShader(fragmentShaderHandle);
+	/*fin*/
 
 	// Regresa el identificador de este manager
 	// Creamos el identificador para el manager de los shaders
@@ -115,6 +126,7 @@ void Initialise() {
 	glBindAttribLocation(shaderProgram, 1, "VertexColor");
 	//Ejecutamos el proceso de linker (asegurarnos que el vertex y fragment son compatibles)
 	glLinkProgram(shaderProgram);
+
 }
 
 void GameLoop() {
@@ -126,12 +138,14 @@ void GameLoop() {
 	// Activamos el vertexShader y el fragmentShader utilizando el manager
 	glUseProgram(shaderProgram);
 
+	/*++Método Draw inicio++*/
 	// Activamos el manager y en este momento se activan todos los VBOs asociados automáticamente
 	glBindVertexArray(vao);
 	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	// Terminamos de utilizar el manager vao
 	glBindVertexArray(0);
+	/*++Método Draw fin++*/
 
 	// Desactivamos el manager shaderProgram
 	glUseProgram(0);
