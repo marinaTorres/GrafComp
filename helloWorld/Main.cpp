@@ -27,23 +27,67 @@ void Initialise() {
 	// Lista de vec2
 	// Claramente estamos trabajando en el CPU y RAM
 
-	/*++setpositionatribute inicio++*/
+	
 	vector<vec2> positions;
-	positions.push_back(vec2(0.5f, -0.5f));
-	positions.push_back(vec2(0.5f, 0.5f));
-	positions.push_back(vec2(-0.5f, -0.5f));
-	positions.push_back(vec2(-0.5f, 0.5f));
-	/*++fin++*/
+	positions.push_back(vec2(0.0f, 0.0f));
+	int i = 0;
+	float x, y;
+	float radian;
+	for (i; i <= 360; i++) {
+		radian = i*0.01745329252f;
+		x = 1 * cos(radian);
+		y = 1 * sin(radian);
+		positions.push_back(vec2(x,y));
+	}
+
+	
+	/*positions.push_back(vec2(0.0f, 0.0f));
+	positions.push_back(vec2(1.0f, 0.0f));
+	positions.push_back(vec2(1.0f, 0.1f));
+	//positions.push_back(vec2(-0.5f, 0.5f));*/
+	
 
 
 	vector<vec3> colors;
+	
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+
+	colors.push_back(glm::vec3(1.0, 1.0, 1.0));
+
+	double z;
+	i = 0;
+	for (i; i <= 360; i++) {
+		radian = i*0.01745329252f;
+		x = 1 * cos(radian);
+		y = 1 * sin(radian);
+		z = 1 * cos(radian);
+		colors.push_back(glm::vec3(x, y, z));
+	}
+	/*void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 p =fragCoord/iResolution.xy;
+    vec2 q=p-vec2(0.5f,0.5f);
+    
+    vec3 color=vec3(0.5f,0.0f,0.5f);
+    
+    float r=0.2f+0.1f*cos(atan(q.y,q.x)*10.0f+20.0f*q.x+1.0f);
+    
+    color*=smoothstep(r,r+0.1f,length(q));
+    
+    r=0.015f;
+    r+=0.002*cos(120.0f*q.y);
+    r+=exp(-40.0f*p.y);
+    color*=1.0f-(1.0f-smoothstep(r,r+0.002,abs(q.x- 0.25f*sin(5.0f*q.y))))*  (1.0f-smoothstep(0.0f,0.01f,q.y));
+    fragColor=vec4(color,1.0f);
+}
+*/
+	
+	/*colors.push_back(vec3(1.0f, 0.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
-
+	//colors.push_back(vec3(1.0f, 0.0f, 1.0f));*/
+	
 
 	/*++ SetAttributeData(…) inicio++*/
 	// Queremos gengerar 1 manager
@@ -87,7 +131,7 @@ void Initialise() {
 
 	// VERTEX SHADER
 	// Leemos el archivo Default.vert donde está el código del vertex shader.
-	myfile.read("Default.vert");
+	myfile.read("DiscardCenter.vert");
 	// Obtenemos el código fuente y lo guardamos en un string
 	string vertexSource = myfile.getContents();
 	// Creamos un shader de tipo vertex guardamos su identificador en una variable
@@ -102,7 +146,7 @@ void Initialise() {
 	// Vamos a asumir que no hay ningún error.
 	glCompileShader(vertexShaderHandle);
 
-	myfile.read("Default.frag");
+	myfile.read("DiscardCenter.frag");
 	string fragmentSource = myfile.getContents();
 	GLuint fragmentShaderHandle =
 		glCreateShader(GL_FRAGMENT_SHADER);
@@ -142,7 +186,7 @@ void GameLoop() {
 	// Activamos el manager y en este momento se activan todos los VBOs asociados automáticamente
 	glBindVertexArray(vao);
 	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
 	// Terminamos de utilizar el manager vao
 	glBindVertexArray(0);
 	/*++Método Draw fin++*/
