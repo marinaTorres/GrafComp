@@ -20,6 +20,9 @@ GLuint vao;
 
 // Identificador del manager de los shaders (shaderProgramme)
 GLuint shaderProgram;
+//float vertsPerFrame = 0.0f;
+//float delta = 0.08;
+
 
 void Initialise() {
 	// Creando toda la memoria una sola vez al inicio de vida de mi programa
@@ -29,65 +32,34 @@ void Initialise() {
 
 	
 	vector<vec2> positions;
-	positions.push_back(vec2(0.0f, 0.0f));
-	int i = 0;
-	float x, y;
-	float radian;
-	for (i; i <= 360; i++) {
-		radian = i*0.01745329252f;
-		x = 1 * cos(radian);
-		y = 1 * sin(radian);
-		positions.push_back(vec2(x,y));
-	}
+	positions.push_back(vec2(0.9f, 0.3f));
+	positions.push_back(vec2(0.5f, 0.19f));
+	positions.push_back(vec2(0.6f, -0.8f));
+	positions.push_back(vec2(0.3f, -0.4f));
+	positions.push_back(vec2(-0.6f, -0.8f));
+	positions.push_back(vec2(-0.3f, -0.4f));
+	positions.push_back(vec2(-0.88f, 0.3f));
+	positions.push_back(vec2(-0.5f, 0.19f));
+	positions.push_back(vec2(0.0f, 0.9f));
+	positions.push_back(vec2(0.0f, 0.5f));
+	positions.push_back(vec2(0.9f, 0.3f));
+	positions.push_back(vec2(0.5f, 0.19f));
 
-	
-	/*positions.push_back(vec2(0.0f, 0.0f));
-	positions.push_back(vec2(1.0f, 0.0f));
-	positions.push_back(vec2(1.0f, 0.1f));
-	//positions.push_back(vec2(-0.5f, 0.5f));*/
-	
-
-
-	vector<vec3> colors;
-	
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
-
-	colors.push_back(glm::vec3(1.0, 1.0, 1.0));
-
-	double z;
-	i = 0;
-	for (i; i <= 360; i++) {
-		radian = i*0.01745329252f;
-		x = 1 * cos(radian);
-		y = 1 * sin(radian);
-		z = 1 * cos(radian);
-		colors.push_back(glm::vec3(x, y, z));
-	}
-	/*void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-    vec2 p =fragCoord/iResolution.xy;
-    vec2 q=p-vec2(0.5f,0.5f);
-    
-    vec3 color=vec3(0.5f,0.0f,0.5f);
-    
-    float r=0.2f+0.1f*cos(atan(q.y,q.x)*10.0f+20.0f*q.x+1.0f);
-    
-    color*=smoothstep(r,r+0.1f,length(q));
-    
-    r=0.015f;
-    r+=0.002*cos(120.0f*q.y);
-    r+=exp(-40.0f*p.y);
-    color*=1.0f-(1.0f-smoothstep(r,r+0.002,abs(q.x- 0.25f*sin(5.0f*q.y))))*  (1.0f-smoothstep(0.0f,0.01f,q.y));
-    fragColor=vec4(color,1.0f);
-}
-*/
-	
-	/*colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+	vector<vec3> colors;
+	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
+	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	//colors.push_back(vec3(1.0f, 0.0f, 1.0f));*/
-	
+	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
 
 	/*++ SetAttributeData(…) inicio++*/
 	// Queremos gengerar 1 manager
@@ -131,7 +103,7 @@ void Initialise() {
 
 	// VERTEX SHADER
 	// Leemos el archivo Default.vert donde está el código del vertex shader.
-	myfile.read("DiscardCenter.vert");
+	myfile.read("Default.vert");
 	// Obtenemos el código fuente y lo guardamos en un string
 	string vertexSource = myfile.getContents();
 	// Creamos un shader de tipo vertex guardamos su identificador en una variable
@@ -146,7 +118,7 @@ void Initialise() {
 	// Vamos a asumir que no hay ningún error.
 	glCompileShader(vertexShaderHandle);
 
-	myfile.read("DiscardCenter.frag");
+	myfile.read("Default.frag");
 	string fragmentSource = myfile.getContents();
 	GLuint fragmentShaderHandle =
 		glCreateShader(GL_FRAGMENT_SHADER);
@@ -171,9 +143,60 @@ void Initialise() {
 	//Ejecutamos el proceso de linker (asegurarnos que el vertex y fragment son compatibles)
 	glLinkProgram(shaderProgram);
 
+
+	//para configurar un uniform, tenemos que 
+	//decirle a openGL que vamos a utilizar 
+	//shader program(manage)
+	/*glUseProgram(shaderProgram);
+	GLint  uniformLocation = glGetUniformLocation(shaderProgram, "Resolution");
+	glUniform2f(uniformLocation,400.0f,400.0f);
+	glUseProgram(0);*/
+
+	/*positions.push_back(vec2(0.0f, 0.0f));
+	int i = 0;
+	float x, y;
+	float radian;
+	for (i; i <= 360; i++) {
+	radian = i*0.01745329252f;
+	x = 1 * cos(radian);
+	y = 1 * sin(radian);
+	positions.push_back(vec2(x,y));
+	}
+
+	*/
+
+	/*colors.push_back(glm::vec3(1.0, 1.0, 1.0));
+
+	double z;
+	i = 0;
+	for (i; i <= 360; i++) {
+	radian = i*0.01745329252f;
+	x = 1 * cos(radian);
+	y = 1 * sin(radian);
+	z = sin(radian)*cos(radian);
+	colors.push_back(glm::vec3(x, y, z));
+	}*/
+	/*void mainImage( out vec4 fragColor, in vec2 fragCoord )
+	{
+	vec2 p =fragCoord/iResolution.xy;
+	vec2 q=p-vec2(0.5f,0.5f);
+
+	vec3 color=vec3(0.5f,0.0f,0.5f);
+
+	float r=0.2f+0.1f*cos(atan(q.y,q.x)*10.0f+20.0f*q.x+1.0f);
+
+	color*=smoothstep(r,r+0.1f,length(q));
+
+	r=0.015f;
+	r+=0.002*cos(120.0f*q.y);
+	r+=exp(-40.0f*p.y);
+	color*=1.0f-(1.0f-smoothstep(r,r+0.002,abs(q.x- 0.25f*sin(5.0f*q.y))))*  (1.0f-smoothstep(0.0f,0.01f,q.y));
+	fragColor=vec4(color,1.0f);
+	}
+	*/
 }
 
-void GameLoop() {
+void GameLoop() {//esto es la tarea
 
 	//Limpiamos el buffer de color y el buffer de profundidad
 	// Siempre hacerlo al inicio del frame
@@ -186,7 +209,11 @@ void GameLoop() {
 	// Activamos el manager y en este momento se activan todos los VBOs asociados automáticamente
 	glBindVertexArray(vao);
 	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
+	//glDrawArrays(GL_TRIANGLE_FAN, 0, clamp( vertsPerFrame, 0.0f, 362.0f));
+	//glDrawArrays(GL_TRIANGLE_FAN, 0, 362.0f);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
+
 	// Terminamos de utilizar el manager vao
 	glBindVertexArray(0);
 	/*++Método Draw fin++*/
@@ -194,8 +221,13 @@ void GameLoop() {
 	// Desactivamos el manager shaderProgram
 	glUseProgram(0);
 
-	//Cuando terminamos de renderear, cambiamos los buffers
 	glutSwapBuffers();
+	/*vertsPerFrame += delta;
+	if (vertsPerFrame<0.0f || vertsPerFrame>= 370.0f) {
+		delta *= -1.0f;
+	}*/
+
+	//Cuando terminamos de renderear, cambiamos los buffers
 	
 	/*
 	// WARNING!!!!!! ESTO ES OPENGL VIEJITO!!!!!!
@@ -213,6 +245,20 @@ void GameLoop() {
 	glVertex2d(0.0f, 1.0f);
 
 	glEnd();*/
+}
+
+void Idle() {
+	//cuando entra en estado de reposo se vueve a dibujar
+	glutPostRedisplay();
+}
+
+void ReshapeWindow(int w, int h) {
+	glViewport(0, 0, w, h);
+	/*glUseProgram(shaderProgram);
+	GLint  uniformLocation = glGetUniformLocation(shaderProgram, "Resolution");
+	glUniform2f(uniformLocation, w, h);
+	glUseProgram(0);*/
+
 }
 
 int main(int argc, char* argv[]) {
@@ -242,10 +288,26 @@ int main(int argc, char* argv[]) {
 	glutCreateWindow("Título Genial GL");
 
 	glutDisplayFunc(GameLoop);
+		//asociamos una función ara el cambio de resolucion de la ventana.
+		//freeglut la va a mandar a llamar 
+		//cuando alguien cambie el tamaño de la ventana
+	glutReshapeFunc(ReshapeWindow);
 
+	//asociamos la función cuando openGL entra en estado de reposos
+	glutIdleFunc(Idle);
 	// Inicializamos GLEW. Esta librería se encarga de obtener el API de OpenGL de nuestra tarjeta de video
 	glewInit();
+	
+	//Config OpenGL
+	//este es el color por default en el buffer del color
+	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
 
+	glEnable(GL_DEPTH_TEST);
+	//borrado de caras traseras, todos los triangulos CCW
+	glEnable(GL_CULL_FACE);
+	//No dibujar las caras de atras
+	glEnable(GL_BACK);
+	std::cout << glGetString(GL_VERSION) << std::endl;
 	// Configurar OpenGl. Este es el color por dedault del buffer de color en el framebuffer.
 	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
 
