@@ -31,6 +31,12 @@
     <Filter Include="Archivos de recursos\Tarea 1">
       <UniqueIdentifier>{babf29ba-36d2-475d-9b20-6d94d4b38a3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de recursos\Tarea 4">
+      <UniqueIdentifier>{155f0bd3-a136-4f40-a78f-e743b0e06abc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\Tarea 4">
+      <UniqueIdentifier>{7a33259d-f3b7-4926-b614-8107e3847d3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circle.h">
@@ -44,6 +50,15 @@
     </ClInclude>
     <ClInclude Include="inputFile.h">
       <Filter>Archivos de encabezado\Tarea 3</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Archivos de encabezado\Tarea 4</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Archivos de encabezado\Tarea 4</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Archivos de encabezado\Tarea 4</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +82,15 @@
     </ClCompile>
     <ClCompile Include="Clase1.cpp">
       <Filter>Archivos de recursos\Tarea 1</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Archivos de recursos\Tarea 4</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Archivos de recursos\Tarea 4</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Archivos de recursos\Tarea 4</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

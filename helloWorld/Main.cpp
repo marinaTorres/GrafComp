@@ -8,8 +8,12 @@ Autor: A01375051 Marina Fernanda Torres Gómez
 #include <GL/freeglut.h>
 #include <iostream>
 #include <vector>
-#include "inputFile.h"
 #include <glm/glm.hpp>
+
+#include "inputFile.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 
 using namespace std;
 using namespace glm;
@@ -23,6 +27,8 @@ GLuint shaderProgram;
 //float vertsPerFrame = 0.0f;
 //float delta = 0.08;
 
+Mesh mesh;
+ShaderProgram program;
 
 void Initialise() {
 	// Creando toda la memoria una sola vez al inicio de vida de mi programa
@@ -61,88 +67,20 @@ void Initialise() {
 	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
 	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
 
-	/*++ SetAttributeData(…) inicio++*/
-	// Queremos gengerar 1 manager
-	glGenVertexArrays(1, &vao);
-	// Utilizar el vao
-	// A partir de este momento, todos los VBOs creados y configurados se van a asociar a este manager
-	glBindVertexArray(vao);
+	
+	
+	mesh.CreateMesh(12);
+	mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
+	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
 
-	// TIpo de dato de OpenGL entero sin signo multiplataforma
-	// Empezamos a crear bufers (identificador de VBO de posiciones)
-	GLuint positionsVBO;
-	// Creación del VBO de posiciones lo guarda en positionsVBO y da un identificador para utilizarlo
-	glGenBuffers(1, &positionsVBO);
-	// Activamos el buffer de posiciones para poder utilizarlo, este buffer ES UN ATRIBUTO (GL ARRAY BUFFER)
-	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	// Creamos la memoria y la inicializamos con los datos del atributo de posiciones
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec2)*positions.size(), positions.data(), GL_STATIC_DRAW);
-	// Activamos el atributo en la tarjeta de video
-	glEnableVertexAttribArray(0);
-	// Configuramos los datos del atributo en la tarjeta de video
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-	// Ya no vamos a utilizar este Vertex Buffer Object en este momento
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	GLuint colorsVBO;
-	glGenBuffers(1, &colorsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*colors.size(), colors.data(), GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Desactivamos el manager vao
-	glBindVertexArray(0);
-	/*++Fin++*/
-
-
-	/*++Clase shades inicio++*/
-	// Creamos un objeto para leer archivos
-	inputFile myfile;
-
-	// VERTEX SHADER
-	// Leemos el archivo Default.vert donde está el código del vertex shader.
-	myfile.read("Default.vert");
-	// Obtenemos el código fuente y lo guardamos en un string
-	string vertexSource = myfile.getContents();
-	// Creamos un shader de tipo vertex guardamos su identificador en una variable
-	GLuint vertexShaderHandle =
-		glCreateShader(GL_VERTEX_SHADER);
-	// Obtener los datos en el formato correcto: Vil Cast
-	const GLchar *vertexSource_c =
-		(const GLchar*)vertexSource.c_str();
-	// Le estamos dando el código fuente a OpenGL para que se los asigne al shader
-	glShaderSource(vertexShaderHandle, 1, &vertexSource_c, nullptr);
-	// Compilamos el shader en busca de errores.
-	// Vamos a asumir que no hay ningún error.
-	glCompileShader(vertexShaderHandle);
-
-	myfile.read("Default.frag");
-	string fragmentSource = myfile.getContents();
-	GLuint fragmentShaderHandle =
-		glCreateShader(GL_FRAGMENT_SHADER);
-	const GLchar *fragmentSource_c =
-		(const GLchar*)fragmentSource.c_str();
-	// Continuar leyendo hasta que encuentre un nullptr
-	glShaderSource(fragmentShaderHandle, 1, &fragmentSource_c, nullptr);
-	glCompileShader(fragmentShaderHandle);
-	/*fin*/
-
-	// Regresa el identificador de este manager
-	// Creamos el identificador para el manager de los shaders
-	shaderProgram = glCreateProgram();
-	// Adjuntamos el vertex shader del manager (van a trabajar juntos)
-	glAttachShader(shaderProgram, vertexShaderHandle);
-	// Adjuntamos el fragment shader al manager (van a trabajar juntos)
-	glAttachShader(shaderProgram, fragmentShaderHandle);
-	// Asociamos un buffer con índice 0 (posiciones) a la variable VertexPosition
-	glBindAttribLocation(shaderProgram, 0, "VertexPosition");
-	// Asociamos un buffer con índice 1 (colores) a la variable VertexColor
-	glBindAttribLocation(shaderProgram, 1, "VertexColor");
-	//Ejecutamos el proceso de linker (asegurarnos que el vertex y fragment son compatibles)
-	glLinkProgram(shaderProgram);
-
+	program.CreateProgram();
+	program.SetAttribute(0, "VertexPosition");
+	program.SetAttribute(1, "VertexColor");
+	program.AttachShader("Default.vert", GL_VERTEX_SHADER);
+	program.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
+	program.LinkProgram();
+	
+	
 
 	//para configurar un uniform, tenemos que 
 	//decirle a openGL que vamos a utilizar 
@@ -201,25 +139,11 @@ void GameLoop() {//esto es la tarea
 	//Limpiamos el buffer de color y el buffer de profundidad
 	// Siempre hacerlo al inicio del frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	program.Activate();
+	mesh.Draw(GL_TRIANGLE_STRIP);
+	program.Desactivate();
 
-	// Activamos el vertexShader y el fragmentShader utilizando el manager
-	glUseProgram(shaderProgram);
-
-	/*++Método Draw inicio++*/
-	// Activamos el manager y en este momento se activan todos los VBOs asociados automáticamente
-	glBindVertexArray(vao);
-	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
-	//glDrawArrays(GL_TRIANGLE_FAN, 0, clamp( vertsPerFrame, 0.0f, 362.0f));
-	//glDrawArrays(GL_TRIANGLE_FAN, 0, 362.0f);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
-
-	// Terminamos de utilizar el manager vao
-	glBindVertexArray(0);
-	/*++Método Draw fin++*/
-
-	// Desactivamos el manager shaderProgram
-	glUseProgram(0);
 
 	glutSwapBuffers();
 	/*vertsPerFrame += delta;
@@ -281,7 +205,7 @@ int main(int argc, char* argv[]) {
 	// true color RGBA, un buffer de produndidad y un segundo buffer para renderear
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE); // Dos framebuffers
 
-															   // Iniciar las dimensiones de la ventana (en pixeles)
+	// Iniciar las dimensiones de la ventana (en pixeles)
 	glutInitWindowSize(400, 400);
 
 	// Creeamos la ventana y le damos un título.
