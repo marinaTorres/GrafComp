@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <vector>
+#include <GL/freeglut.h>
 #include <glm/glm.hpp>
 
 using namespace std;

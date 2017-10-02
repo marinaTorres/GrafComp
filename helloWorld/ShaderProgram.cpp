@@ -1,9 +1,4 @@
 #include "ShaderProgram.h"
-#include <string>
-#include <glm/glm.hpp>
-
-using namespace std;
-using namespace glm;
 
 ShaderProgram::ShaderProgram(){
 	_programHandle = 0;

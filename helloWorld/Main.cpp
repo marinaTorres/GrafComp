@@ -4,11 +4,12 @@ Fecha: 18 de agosto del 2017
 Autor: A01375051 Marina Fernanda Torres Gómez
 *********************************************************/
 
+#include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
+#include <iostream>
 
 #include "inputFile.h"
 #include "Mesh.h"
@@ -22,8 +23,7 @@ using namespace glm;
 GLuint vao;
 /*++createMesh fin++*/
 
-// Identificador del manager de los shaders (shaderProgramme)
-GLuint shaderProgram;
+
 //float vertsPerFrame = 0.0f;
 //float delta = 0.08;
 

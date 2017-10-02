@@ -26,7 +26,7 @@ void Mesh::Draw(GLenum primitive){
 	// Función de dibujado SIN índices a partir de qué vértice y cuántos más se dibujarán
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, clamp( vertsPerFrame, 0.0f, 362.0f));
 	//glDrawArrays(GL_TRIANGLE_FAN, 0, 362.0f);
-	glDrawArrays(primitive, 0, 12);
+	glDrawArrays(primitive, 0, _vertexCount);
 	// Terminamos de utilizar el manager vao
 	glBindVertexArray(0);
 
@@ -37,7 +37,7 @@ void Mesh::SetPositionAttribute(vector<vec2> positions, GLenum usage, GLuint loc
 		return;
 	}
 	else {
-		SetAttributeData(_positionsVertexBufferObject, sizeof(glm::vec2) * positions.size(), positions.data(), usage, locationIndex, 2);
+		SetAttributeData(_positionsVertexBufferObject, sizeof(vec2) * positions.size(), positions.data(), usage, locationIndex, 2);
 	}
 }
 
@@ -46,7 +46,7 @@ void Mesh::SetPositionAttribute(vector<vec3> positions, GLenum usage, GLuint loc
 		return;
 	}
 	else {
-		SetAttributeData(_positionsVertexBufferObject, sizeof(glm::vec3) * positions.size(), positions.data(), usage, locationIndex, 2);
+		SetAttributeData(_positionsVertexBufferObject, sizeof(vec3) * positions.size(), positions.data(), usage, locationIndex, 3);
 	}
 }
 
@@ -55,7 +55,7 @@ void Mesh::SetColorAttribute(vector<vec3> colors, GLenum usage, GLuint locationI
 		return;
 	}
 	else {
-		SetAttributeData(_colorsVertexBufferObject, sizeof(glm::vec3) * colors.size(), colors.data(), usage, locationIndex, 3);
+		SetAttributeData(_colorsVertexBufferObject, sizeof(vec3) * colors.size(), colors.data(), usage, locationIndex, 3);
 	}	
 }
 
@@ -64,7 +64,7 @@ void Mesh::SetColorAttribute(vector<vec4> colors, GLenum usage, GLuint locationI
 		return;
 	}
 	else {
-		SetAttributeData(_colorsVertexBufferObject, sizeof(glm::vec4) * colors.size(), colors.data(), usage, locationIndex, 3);
+		SetAttributeData(_colorsVertexBufferObject, sizeof(vec4) * colors.size(), colors.data(), usage, locationIndex, 4);
 	}
 }
 
