@@ -15,13 +15,10 @@ Autor: A01375051 Marina Fernanda Torres Gómez
 #include "Mesh.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
-
+#include "Transform.h"
+#include "Camera.h"
 using namespace std;
 using namespace glm;
-/*++createMesh inicio++*/
-// Identificadoe del manager al que vamos a asociar todos los VOBs que tenga nuestra geometría
-GLuint vao;
-/*++createMesh fin++*/
 
 
 //float vertsPerFrame = 0.0f;
@@ -29,6 +26,8 @@ GLuint vao;
 
 Mesh mesh;
 ShaderProgram program;
+Transform _transform;
+Camera _camera;
 
 void Initialise() {
 	// Creando toda la memoria una sola vez al inicio de vida de mi programa
@@ -38,34 +37,28 @@ void Initialise() {
 
 	
 	vector<vec2> positions;
-	positions.push_back(vec2(0.9f, 0.3f));
-	positions.push_back(vec2(0.5f, 0.19f));
-	positions.push_back(vec2(0.6f, -0.8f));
-	positions.push_back(vec2(0.3f, -0.4f));
-	positions.push_back(vec2(-0.6f, -0.8f));
-	positions.push_back(vec2(-0.3f, -0.4f));
-	positions.push_back(vec2(-0.88f, 0.3f));
-	positions.push_back(vec2(-0.5f, 0.19f));
-	positions.push_back(vec2(0.0f, 0.9f));
-	positions.push_back(vec2(0.0f, 0.5f));
-	positions.push_back(vec2(0.9f, 0.3f));
-	positions.push_back(vec2(0.5f, 0.19f));
-
+	vector<vec3> colors;
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
-	vector<vec3> colors;
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+
+	float arr[6] = { 18.f, 306.f, 234.f, 162.f, 90.f, 18.f };
+	for (int i = 0; i < 6; i++) {
+		positions.push_back(vec2(cos(radians(arr[i])), sin(radians(arr[i]))));
+		positions.push_back(vec2(0.5*cos(radians(arr[i])), 0.5*sin(radians(arr[i]))));
+	}
+
 	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
+	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
+	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
 	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 1.0f));
 
 	
 	
@@ -74,13 +67,15 @@ void Initialise() {
 	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
 
 	program.CreateProgram();
-	program.SetAttribute(0, "VertexPosition");
-	program.SetAttribute(1, "VertexColor");
 	program.AttachShader("Default.vert", GL_VERTEX_SHADER);
 	program.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
+	program.SetAttribute(0, "VertexPosition");
+	program.SetAttribute(1, "VertexColor");
+	
 	program.LinkProgram();
 	
-	
+	//_transform.SetRotation(0.0f, 0.0f, 90.0f);
+	_camera.SetOrthographic(1.0f,1.0f);
 
 	//para configurar un uniform, tenemos que 
 	//decirle a openGL que vamos a utilizar 
@@ -139,8 +134,13 @@ void GameLoop() {//esto es la tarea
 	//Limpiamos el buffer de color y el buffer de profundidad
 	// Siempre hacerlo al inicio del frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	_camera.MoveForward(0.0001f);
+	//_transform.Rotate(0.0f, 0.1f, 0.0f, true);//Rotación Global
+	_transform.Rotate(0.0f, 0.1f, 0.0f, false);//Rotación Local
 	
 	program.Activate();
+	program.SetUniformMatrix("mvplMatrix",_camera.GetViewProjection()* _transform.GetModelMatrix());
 	mesh.Draw(GL_TRIANGLE_STRIP);
 	program.Desactivate();
 
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
 	glutInitWindowSize(400, 400);
 
 	// Creeamos la ventana y le damos un título.
-	glutCreateWindow("Título Genial GL");
+	glutCreateWindow("Hello World!");
 
 	glutDisplayFunc(GameLoop);
 		//asociamos una función ara el cambio de resolucion de la ventana.
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
 	glEnable(GL_BACK);
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	// Configurar OpenGl. Este es el color por dedault del buffer de color en el framebuffer.
-	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	cout << glGetString(GL_VERSION) << endl;
 

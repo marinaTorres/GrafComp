@@ -10,6 +10,11 @@ Shader::~Shader(){
 }
 
 void Shader::CreateShader(string path, GLenum type){
+	
+	if (_shaderHandle != 0) {
+		glDeleteShader(_shaderHandle);
+	}
+	
 	// Creamos un objeto para leer archivos
 	inputFile myfile;
 
@@ -19,7 +24,7 @@ void Shader::CreateShader(string path, GLenum type){
 	// Obtenemos el código fuente y lo guardamos en un string
 	string ShaderSource = myfile.getContents();
 	// Creamos un shader de tipo vertex guardamos su identificador en una variable
-	GLuint _shaderHandle = glCreateShader(type);
+	_shaderHandle = glCreateShader(type);
 
 	// Obtener los datos en el formato correcto: Vil Cast
 	const GLchar *ShaderSource_c = (const GLchar*)ShaderSource.c_str();

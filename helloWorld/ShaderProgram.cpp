@@ -1,4 +1,5 @@
 #include "ShaderProgram.h"
+#include <glm/gtc/type_ptr.hpp>
 
 ShaderProgram::ShaderProgram(){
 	_programHandle = 0;
@@ -69,11 +70,19 @@ void ShaderProgram::SetUniformf(string name, float x, float y, float z, float w)
 	glUniform4f(uniformLocation, x, y, z, w);
 }
 
+void ShaderProgram::SetUniformMatrix(string name, mat4 matrix){
+	GLuint uniformLocation = glGetUniformLocation(_programHandle, name.c_str());
+	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, value_ptr(matrix));
+}
+
 void ShaderProgram::DeleteAndDetachShaders(){
-	_attachedShaders.clear();
+	for (int i = 0; i < _attachedShaders.size(); i++) {
+		glDetachShader(_programHandle, _attachedShaders[i].get()->getHandle());
+	}
+		_attachedShaders.clear();
 }
 
 void ShaderProgram::DeleteProgram(){
 	DeleteAndDetachShaders();
-	glUseProgram(0);
+	glDeleteProgram(_programHandle);
 }
