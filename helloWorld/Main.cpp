@@ -49,96 +49,97 @@ void Initialise() {
 	}*/
 
 
+
 	//++++++++++++++++++++++Colors++++++++++++++++++++++\\
 
-	//Cara Frontal-Purple
-	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
-	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
-	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
-	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
-	
-	//Cara Posterior-Pink
-	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
-	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
-	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
-	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
+	//Cara Frontal-MORADO
+	colors.push_back(vec3(0.545f, 0.000f, 0.545f));
+	colors.push_back(vec3(0.600f, 0.196f, 0.800f));
+	colors.push_back(vec3(0.580f, 0.000f, 0.827f));
+	colors.push_back(vec3(0.541f, 0.169f, 0.886f));
 
-	
-	//Cara Lateral Derecha-Blue
-	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
-	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
-	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
-	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
+	//Cara Lateral Izquierda-VERDE
+	colors.push_back(vec3(0.596f, 0.984f, 0.596f));
+	colors.push_back(vec3(0.565f, 0.933f, 0.565f));
+	colors.push_back(vec3(0.000f, 0.980f, 0.604f));
+	colors.push_back(vec3(0.000f, 1.000f, 0.498f));
+
+
+	//Cara posterior-ROSA
+	colors.push_back(vec3(1.000f, 0.412f, 0.706f));
+	colors.push_back(vec3(1.000f, 0.078f, 0.576f));
+	colors.push_back(vec3(0.780f, 0.082f, 0.522f));
+	colors.push_back(vec3(0.859f, 0.439f, 0.576f));
+
+
+	//Cara lateral Derecha-NARANJA
+	colors.push_back(vec3(1.000f, 0.627f, 0.478f));
+	colors.push_back(vec3(1.000f, 0.498f, 0.314f));
+	colors.push_back(vec3(1.000f, 0.388f, 0.278f));
+	colors.push_back(vec3(1.000f, 0.271f, 0.000f));
+
+	//cara Superior-AZUL
+	colors.push_back(vec3(0.373f, 0.620f, 0.627f));
+	colors.push_back(vec3(0.275f, 0.510f, 0.706f));
+	colors.push_back(vec3(0.690f, 0.769f, 0.871f));
+	colors.push_back(vec3(0.690f, 0.878f, 0.902f));
+
+	//cara Inferior-GRIS
+	colors.push_back(vec3(0.502f, 0.502f, 0.502f));
+	colors.push_back(vec3(0.412f, 0.412f, 0.412f));
+	colors.push_back(vec3(0.467f, 0.533f, 0.600f));
+	colors.push_back(vec3(0.439f, 0.502f, 0.565f));
 	
 
-	//Cara lateral Izquierda-Yellow
-	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
-	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
-	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
-	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
-	
-	//cara Superior-White
-	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
-	
-	//cara Inferior-Lima
-	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
-	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
-	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
-	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
-	
 
 	//++++++++++++++++++++++Positions++++++++++++++++++++++\\
-
 	//Cara Frontal
 	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->0
 	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->1
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->2
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->3
 
-	//Cara Posterior
+												 //Cara Posterior
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->4
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->5
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->6
 	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->7
 
-	//Cara Lateral Derecha
+												  //Cara Lateral Derecha
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->8
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->9
 	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->10
 	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->11
 
-	//Cara Lateral Izquierda
+												//Cara Lateral Izquierda
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->12
 	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->13
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->14
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->15
 
 
-	//Cara Superior
+												 //Cara Superior
 	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->16
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->17
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->18
 	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->19
 
-	//Cara Inferior
+												  //Cara Inferior
 	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->20
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->21
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->22
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->23
 
 
-	
-	//++++++++++++++++++++++Indices y más...++++++++++++++++++++++\\
 
+	//++++++++++++++++++++++Indices y más...++++++++++++++++++++++\\
+												   	
 	vector<unsigned int> indices = {20,21,22,22,21,23,
-									0,1,2,2,1,3,
-									8,9,10,10,9,11,
-									4,5,6,6,5,7,
-									12,13,14,14,13,15,
-									16,17,18,18,17,19,
+									0, 1, 2, 2, 1, 3,
+									8, 9, 10, 10, 9, 11,
+									4, 5, 6, 6, 5, 7,
+									12, 13, 14, 14, 13, 15,
+									16, 17, 18, 18, 17, 19,
 									};
 
 	
@@ -157,7 +158,7 @@ void Initialise() {
 	program.SetAttribute(1, "VertexColor");
 	program.LinkProgram();
 	
-	_transform.SetRotation(0.0f, 0.0f, 45.0f);
+	//_transform.SetRotation(0.0f, 0.0f, 45.0f);
 	_camera.SetOrthographic(6.0f, 1.0f);
 
 	//para configurar un uniform, tenemos que 
@@ -219,8 +220,8 @@ void GameLoop() {//esto es la tarea
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//_camera.MoveForward(0.0001f);
-	_transform.Rotate(0.01f, 0.01f, 0.01f, true);//Rotación Global
-	//_transform.Rotate(0.0f, 0.1f, 0.0f, false);//Rotación Local
+	//_transform.Rotate(0.01f, 0.01f, 0.01f, true);//Rotación Global
+	_transform.Rotate(0.01f, 0.01f, 0.01f, false);//Rotación Local
 	
 	program.Activate();
 	program.SetUniformMatrix("mvplMatrix",_camera.GetViewProjection()* _transform.GetModelMatrix());
@@ -310,10 +311,11 @@ int main(int argc, char* argv[]) {
 	glClearColor(1.0f, 1.0f, 3.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
+	
 	//borrado de caras traseras, todos los triangulos CCW
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	//No dibujar las caras de atras
-	glEnable(GL_BACK);
+	//glEnable(GL_BACK);
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	// Configurar OpenGl. Este es el color por dedault del buffer de color en el framebuffer.
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
