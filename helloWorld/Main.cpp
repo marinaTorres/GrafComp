@@ -36,46 +36,129 @@ void Initialise() {
 	// Claramente estamos trabajando en el CPU y RAM
 
 	
-	vector<vec2> positions;
+	vector<vec3> positions;
 	vector<vec3> colors;
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
 
-	float arr[6] = { 18.f, 306.f, 234.f, 162.f, 90.f, 18.f };
+	//PENTÁGONO
+	/*float arr[6] = { 18.f, 306.f, 234.f, 162.f, 90.f, 18.f };
 	for (int i = 0; i < 6; i++) {
 		positions.push_back(vec2(cos(radians(arr[i])), sin(radians(arr[i]))));
-		positions.push_back(vec2(0.5*cos(radians(arr[i])), 0.5*sin(radians(arr[i]))));
-	}
+		positions.push_back(vec2(3.0*cos(radians(arr[i])), 3.0*sin(radians(arr[i]))));
+	}*/
 
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
-	colors.push_back(vec3(1.0f, 0.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 1.0f, 0.0f));
-	colors.push_back(vec3(0.0f, 0.0f, 1.0f));
+
+	//++++++++++++++++++++++Colors++++++++++++++++++++++\\
+
+	//Cara Frontal-Purple
+	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
+	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
+	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
+	colors.push_back(vec3(0.580f, 0.0f, 0.827f));
+	
+	//Cara Posterior-Pink
+	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
+	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
+	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
+	colors.push_back(vec3(0.933f, 0.510f, 0.933f));
 
 	
+	//Cara Lateral Derecha-Blue
+	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
+	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
+	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
+	colors.push_back(vec3(0.125f, 0.698f, 0.667f));
 	
-	mesh.CreateMesh(12);
+
+	//Cara lateral Izquierda-Yellow
+	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
+	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
+	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
+	colors.push_back(vec3(1.000f, 1.000f, 0.000f));
+	
+	//cara Superior-White
+	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
+	colors.push_back(vec3(1.0f, 1.0f, 1.0f));
+	
+	//cara Inferior-Lima
+	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
+	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
+	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
+	colors.push_back(vec3(0.486f, 0.988f, 0.000f));
+	
+
+	//++++++++++++++++++++++Positions++++++++++++++++++++++\\
+
+	//Cara Frontal
+	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->0
+	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->1
+	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->2
+	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->3
+
+	//Cara Posterior
+	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->4
+	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->5
+	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->6
+	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->7
+
+	//Cara Lateral Derecha
+	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->8
+	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->9
+	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->10
+	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->11
+
+	//Cara Lateral Izquierda
+	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->12
+	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->13
+	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->14
+	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->15
+
+
+	//Cara Superior
+	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->16
+	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->17
+	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->18
+	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->19
+
+	//Cara Inferior
+	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->20
+	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->21
+	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->22
+	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->23
+
+
+	
+	//++++++++++++++++++++++Indices y más...++++++++++++++++++++++\\
+
+	vector<unsigned int> indices = {20,21,22,22,21,23,
+									0,1,2,2,1,3,
+									8,9,10,10,9,11,
+									4,5,6,6,5,7,
+									12,13,14,14,13,15,
+									16,17,18,18,17,19,
+									};
+
+	
+
+	mesh.CreateMesh(24);
 	mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
 	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
+	mesh.SetIndices(indices, GL_STATIC_DRAW);
+	
+	
 
 	program.CreateProgram();
 	program.AttachShader("Default.vert", GL_VERTEX_SHADER);
 	program.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
 	program.SetAttribute(0, "VertexPosition");
 	program.SetAttribute(1, "VertexColor");
-	
 	program.LinkProgram();
 	
-	//_transform.SetRotation(0.0f, 0.0f, 90.0f);
-	_camera.SetOrthographic(1.0f,1.0f);
+	_transform.SetRotation(0.0f, 0.0f, 45.0f);
+	_camera.SetOrthographic(6.0f, 1.0f);
 
 	//para configurar un uniform, tenemos que 
 	//decirle a openGL que vamos a utilizar 
@@ -112,9 +195,9 @@ void Initialise() {
 	/*void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	{
 	vec2 p =fragCoord/iResolution.xy;
-	vec2 q=p-vec2(0.5f,0.5f);
+	vec2 q=p-vec2(3.0f,3.0f);
 
-	vec3 color=vec3(0.5f,0.0f,0.5f);
+	vec3 color=vec3(3.0f,0.0f,3.0f);
 
 	float r=0.2f+0.1f*cos(atan(q.y,q.x)*10.0f+20.0f*q.x+1.0f);
 
@@ -135,13 +218,13 @@ void GameLoop() {//esto es la tarea
 	// Siempre hacerlo al inicio del frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_camera.MoveForward(0.0001f);
-	//_transform.Rotate(0.0f, 0.1f, 0.0f, true);//Rotación Global
-	_transform.Rotate(0.0f, 0.1f, 0.0f, false);//Rotación Local
+	//_camera.MoveForward(0.0001f);
+	_transform.Rotate(0.01f, 0.01f, 0.01f, true);//Rotación Global
+	//_transform.Rotate(0.0f, 0.1f, 0.0f, false);//Rotación Local
 	
 	program.Activate();
 	program.SetUniformMatrix("mvplMatrix",_camera.GetViewProjection()* _transform.GetModelMatrix());
-	mesh.Draw(GL_TRIANGLE_STRIP);
+	mesh.Draw(GL_TRIANGLES);
 	program.Desactivate();
 
 
@@ -224,7 +307,7 @@ int main(int argc, char* argv[]) {
 	
 	//Config OpenGL
 	//este es el color por default en el buffer del color
-	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
+	glClearColor(1.0f, 1.0f, 3.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	//borrado de caras traseras, todos los triangulos CCW
