@@ -21,12 +21,16 @@ using namespace std;
 using namespace glm;
 
 
-//float vertsPerFrame = 0.0f;
-//float delta = 0.08;
+float pos = 0.0; // Índice para la trayectoria del círculo de la geometría1
+float deltaCirculo = 0.01f;
+float inc = 0.0; // Incremento en la escala de la geometría2
+float deltaEscala = 0.00005f;
+double colour = 0.0; // Color de fondo
 
 Mesh mesh;
 ShaderProgram program;
 Transform _transform;
+Transform _transform2;
 Camera _camera;
 
 void Initialise() {
@@ -35,9 +39,6 @@ void Initialise() {
 	// Lista de vec2
 	// Claramente estamos trabajando en el CPU y RAM
 
-	
-	vector<vec3> positions;
-	vector<vec3> colors;
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
 
@@ -46,10 +47,10 @@ void Initialise() {
 	for (int i = 0; i < 6; i++) {
 		positions.push_back(vec2(cos(radians(arr[i])), sin(radians(arr[i]))));
 		positions.push_back(vec2(3.0*cos(radians(arr[i])), 3.0*sin(radians(arr[i]))));
-	}*/
+	}
 
 
-
+	 Cubo
 	//++++++++++++++++++++++Colors++++++++++++++++++++++\\
 
 	//Cara Frontal-MORADO
@@ -99,32 +100,32 @@ void Initialise() {
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->2
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->3
 
-												 //Cara Posterior
+	//Cara Posterior
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->4
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->5
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->6
 	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->7
 
-												  //Cara Lateral Derecha
+	//Cara Lateral Derecha
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->8
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->9
 	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->10
 	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->11
 
-												//Cara Lateral Izquierda
+	//Cara Lateral Izquierda
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->12
 	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->13
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->14
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->15
 
 
-												 //Cara Superior
+	//Cara Superior
 	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->16
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->17
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->18
 	positions.push_back(vec3(-3.0f, 3.0f, -3.0f));//->19
 
-												  //Cara Inferior
+	//Cara Inferior
 	positions.push_back(vec3(3.0f, -3.0f, 3.0f));//->20
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->21
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->22
@@ -140,11 +141,28 @@ void Initialise() {
 									4, 5, 6, 6, 5, 7,
 									12, 13, 14, 14, 13, 15,
 									16, 17, 18, 18, 17, 19,
-									};
-
+									};*/
 	
+	vector<vec3> positions;
+	vector<vec3> colors;
+	//Posiciones
+	//Punta
+	positions.push_back(vec3(0.0f, 1.0f, 0.0f));//->0
+	//base
+	positions.push_back(vec3(1.0f, -1.0f, 1.0f));//->1
+	positions.push_back(vec3(-1.0f, -1.0f, 1.0f));//->2
+	positions.push_back(vec3(1.0f, -1.0f, -1.0f));//->3
+	positions.push_back(vec3(-1.0f, -1.0f, -1.0f));//->4
 
-	mesh.CreateMesh(24);
+	//Colores
+	colors.push_back(vec3(0.545f, 0.000f, 0.545f));
+	colors.push_back(vec3(0.596f, 0.984f, 0.596f));
+	colors.push_back(vec3(1.000f, 0.412f, 0.706f));
+	colors.push_back(vec3(0.373f, 0.620f, 0.627f));
+	colors.push_back(vec3(0.502f, 0.502f, 0.502f));
+
+	vector<unsigned int> indices = {0,2,1,1,0,3,3,0,4,4,0,2,1,3,2,2,3,4};
+	mesh.CreateMesh(positions.size());
 	mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
 	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
 	mesh.SetIndices(indices, GL_STATIC_DRAW);
@@ -159,7 +177,20 @@ void Initialise() {
 	program.LinkProgram();
 	
 	//_transform.SetRotation(0.0f, 0.0f, 45.0f);
-	_camera.SetOrthographic(6.0f, 1.0f);
+	//_camera.SetOrthographic(6.0f, 1.0f);
+	
+	// Cambio de escala de la geometría1 a 3 veces su tamaño original en los 3 ejes
+	_transform.SetScale(3, 3, 3);
+
+	// Inicialmente la geometría2 empieza con una escala de 0.5
+	_transform2.SetScale(0.5f, 0.5f, 0.5f);
+	// La posición de la geometría2 siempre está en (0,0,0)
+	_transform2.SetPosition(0, 0, 0);
+
+	// Colocando la cámara en (0, 0, 25) para visualizar correctamente las dos geometrías
+	_camera.SetPosition(0, 0, 25);
+
+
 
 	//para configurar un uniform, tenemos que 
 	//decirle a openGL que vamos a utilizar 
@@ -221,14 +252,34 @@ void GameLoop() {//esto es la tarea
 
 	//_camera.MoveForward(0.0001f);
 	//_transform.Rotate(0.01f, 0.01f, 0.01f, true);//Rotación Global
-	_transform.Rotate(0.01f, 0.01f, 0.01f, false);//Rotación Local
-	
+	//_transform.Rotate(0.01f, 0.01f, 0.01f, false);//Rotación Local
+
+	// Geometría1 rota en sus tres ejes coordenados
+	_transform.Rotate(0.03f, 0.015f, 0.03f, false);
+	// Geometría1 sigue una trayectoria circular en el plano XY
+	_transform.SetPosition(5 * cos(radians(pos)), 5 * sin(radians(pos)), 0);
+	pos += deltaCirculo;
+
+	// Geometría2 rota en sus tres ejes coordenados, pero en sentido contrario
+	_transform2.Rotate(-0.03f, -0.015f, -0.03f, false);
+
+	// Incrementar la escala de la geometría2 en el rango de 0.25 -> 1.0
+	_transform2.SetScale(0.5f + inc, 0.5f + inc, 0.5f + inc);
+	if (_transform2.GetScale().x <= 0.25f || _transform2.GetScale().x >= 1.0f) {
+		deltaEscala *= -1.0f;
+	}
+	inc += deltaEscala;
+
 	program.Activate();
+	
 	program.SetUniformMatrix("mvplMatrix",_camera.GetViewProjection()* _transform.GetModelMatrix());
 	mesh.Draw(GL_TRIANGLES);
+
+	program.SetUniformMatrix("mvplMatrix", _camera.GetViewProjection()* _transform2.GetModelMatrix());
+	mesh.Draw(GL_TRIANGLES);
+
 	program.Desactivate();
-
-
+	
 	glutSwapBuffers();
 	/*vertsPerFrame += delta;
 	if (vertsPerFrame<0.0f || vertsPerFrame>= 370.0f) {
@@ -316,7 +367,7 @@ int main(int argc, char* argv[]) {
 	//glEnable(GL_CULL_FACE);
 	//No dibujar las caras de atras
 	//glEnable(GL_BACK);
-	std::cout << glGetString(GL_VERSION) << std::endl;
+	cout << glGetString(GL_VERSION) << endl;
 	// Configurar OpenGl. Este es el color por dedault del buffer de color en el framebuffer.
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
