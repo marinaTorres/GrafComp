@@ -1,9 +1,9 @@
 /*********************************************************
 Materia: Gráficas Computacionales
-Fecha: 18 de agosto del 2017
-Autor: A01375051 Marina Fernanda Torres Gómez
+Fecha: 26 de Octubre del 2017
+Autor: A01374526 José Karlo Hurtado Corona
+Autor: A01375051 Marina Fernanda Torres Gomez
 *********************************************************/
-
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -17,15 +17,20 @@ Autor: A01375051 Marina Fernanda Torres Gómez
 #include "ShaderProgram.h"
 #include "Transform.h"
 #include "Camera.h"
+
 using namespace std;
 using namespace glm;
 
 
-float pos = 0.0; // Índice para la trayectoria del círculo de la geometría1
-float deltaCirculo = 0.01f;
-float inc = 0.0; // Incremento en la escala de la geometría2
-float deltaEscala = 0.00005f;
-double colour = 0.0; // Color de fondo
+//Animación
+float vertsPerFrame = 0.0f;
+float delta = 0.0f;
+float delta2 = 0.0f;
+bool d2 = false;
+float MAN = (delta2 / 360) / 2;
+
+//Posicion de la camara
+vec3 camaraPos = vec3(0.0f, 0.0f, 50.0f);
 
 Mesh mesh;
 ShaderProgram program;
@@ -41,16 +46,12 @@ void Initialise() {
 
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
+	
+	vector<vec3> positions;
+	vector<vec3> colors;
+	vector<vec3> normals;
 
-	//PENTÁGONO
-	/*float arr[6] = { 18.f, 306.f, 234.f, 162.f, 90.f, 18.f };
-	for (int i = 0; i < 6; i++) {
-		positions.push_back(vec2(cos(radians(arr[i])), sin(radians(arr[i]))));
-		positions.push_back(vec2(3.0*cos(radians(arr[i])), 3.0*sin(radians(arr[i]))));
-	}
-
-
-	 Cubo
+	 //Cubo
 	//++++++++++++++++++++++Colors++++++++++++++++++++++\\
 
 	//Cara Frontal-MORADO
@@ -118,7 +119,6 @@ void Initialise() {
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->14
 	positions.push_back(vec3(-3.0f, 3.0f, 3.0f));//->15
 
-
 	//Cara Superior
 	positions.push_back(vec3(3.0f, 3.0f, 3.0f));//->16
 	positions.push_back(vec3(3.0f, 3.0f, -3.0f));//->17
@@ -130,8 +130,43 @@ void Initialise() {
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->21
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->22
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->23
+	
+	//++++++++++++++++++++++Normals++++++++++++++++++++++\\
+	//Delantera
+	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
+	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
+	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
+	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
+	
+	//Atras
+	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
+	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
+	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
+	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
 
+	//Derecha
+	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
+	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
+	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
+	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
 
+	//izquierda
+	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
+	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
+	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
+	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
+
+	//Arriba
+	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
+	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
+	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
+	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
+
+	//Abajo
+	normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+	normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+	normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+	normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
 
 	//++++++++++++++++++++++Indices y más...++++++++++++++++++++++\\
 												   	
@@ -141,10 +176,65 @@ void Initialise() {
 									4, 5, 6, 6, 5, 7,
 									12, 13, 14, 14, 13, 15,
 									16, 17, 18, 18, 17, 19,
-									};*/
+									};
 	
-	vector<vec3> positions;
-	vector<vec3> colors;
+	//Luz
+	vec3 LightColour = vec3(1.0f, 1.0f, 1.0f);
+	vec3 lSource = vec3(18.0f, 0.0f, 20.0f);
+	
+	mesh.CreateMesh(positions.size());
+	mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
+	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
+	mesh.SetNormalAttribute(normals, GL_STATIC_DRAW, 2);
+	mesh.SetIndices(indices, GL_STATIC_DRAW);
+	
+	
+
+	program.CreateProgram();
+	program.AttachShader("Default.vert", GL_VERTEX_SHADER);
+	program.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
+	program.SetAttribute(0, "VertexPosition");
+	program.SetAttribute(1, "VertexColor");
+	program.SetAttribute(2, "VertexNormal");
+	program.LinkProgram();
+	
+
+	program.Activate();
+	program.SetUniformf("Resolution", 400.0f, 400.0f);
+	program.SetUniformf("LightColor", LightColour.x, LightColour.y, LightColour.z);
+	program.SetUniformf("LightPosition", lSource.x, lSource.y, lSource.z);
+	program.SetUniformf("CameraPosition", camaraPos.x, camaraPos.y, camaraPos.z);
+
+	program.Desactivate();
+
+	_camera.SetPosition(camaraPos.x, camaraPos.y, camaraPos.z);
+	_transform.SetScale(2, 2, 2);
+	_transform.SetRotation(0.0f, 25.0f, 0.0f);
+	_transform2.SetScale(30.0f, 0.5f, 30.0f);
+	_transform2.SetPosition(0.0f, -15.0f, 0.0f);
+	_transform2.SetRotation(0.0f, 0.0f, 0.0f);
+
+	/*
+	// Cambio de escala de la geometría1 a 3 veces su tamaño original en los 3 ejes
+	_transform.SetScale(3, 3, 3);
+
+	// Inicialmente la geometría2 empieza con una escala de 0.5
+	_transform2.SetScale(0.5f, 0.5f, 0.5f);
+	// La posición de la geometría2 siempre está en (0,0,0)
+	_transform2.SetPosition(0, 0, 0);
+
+	// Colocando la cámara en (0, 0, 25) para visualizar correctamente las dos geometrías
+	_camera.SetPosition(0, 0, 25);
+
+	
+	//PENTÁGONO
+	float arr[6] = { 18.f, 306.f, 234.f, 162.f, 90.f, 18.f };
+	for (int i = 0; i < 6; i++) {
+	positions.push_back(vec2(cos(radians(arr[i])), sin(radians(arr[i]))));
+	positions.push_back(vec2(3.0*cos(radians(arr[i])), 3.0*sin(radians(arr[i]))));
+	}
+
+	//Triángulo
 	//Posiciones
 	//Punta
 	positions.push_back(vec3(0.0f, 1.0f, 0.0f));//->0
@@ -162,45 +252,16 @@ void Initialise() {
 	colors.push_back(vec3(0.502f, 0.502f, 0.502f));
 
 	vector<unsigned int> indices = {0,2,1,1,0,3,3,0,4,4,0,2,1,3,2,2,3,4};
-	mesh.CreateMesh(positions.size());
-	mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
-	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
-	mesh.SetIndices(indices, GL_STATIC_DRAW);
-	
-	
-
-	program.CreateProgram();
-	program.AttachShader("Default.vert", GL_VERTEX_SHADER);
-	program.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
-	program.SetAttribute(0, "VertexPosition");
-	program.SetAttribute(1, "VertexColor");
-	program.LinkProgram();
-	
-	//_transform.SetRotation(0.0f, 0.0f, 45.0f);
-	//_camera.SetOrthographic(6.0f, 1.0f);
-	
-	// Cambio de escala de la geometría1 a 3 veces su tamaño original en los 3 ejes
-	_transform.SetScale(3, 3, 3);
-
-	// Inicialmente la geometría2 empieza con una escala de 0.5
-	_transform2.SetScale(0.5f, 0.5f, 0.5f);
-	// La posición de la geometría2 siempre está en (0,0,0)
-	_transform2.SetPosition(0, 0, 0);
-
-	// Colocando la cámara en (0, 0, 25) para visualizar correctamente las dos geometrías
-	_camera.SetPosition(0, 0, 25);
-
-
 
 	//para configurar un uniform, tenemos que 
 	//decirle a openGL que vamos a utilizar 
 	//shader program(manage)
-	/*glUseProgram(shaderProgram);
+	glUseProgram(shaderProgram);
 	GLint  uniformLocation = glGetUniformLocation(shaderProgram, "Resolution");
 	glUniform2f(uniformLocation,400.0f,400.0f);
-	glUseProgram(0);*/
+	glUseProgram(0);
 
-	/*positions.push_back(vec2(0.0f, 0.0f));
+	positions.push_back(vec2(0.0f, 0.0f));
 	int i = 0;
 	float x, y;
 	float radian;
@@ -211,9 +272,7 @@ void Initialise() {
 	positions.push_back(vec2(x,y));
 	}
 
-	*/
-
-	/*colors.push_back(glm::vec3(1.0, 1.0, 1.0));
+	colors.push_back(glm::vec3(1.0, 1.0, 1.0));
 
 	double z;
 	i = 0;
@@ -223,8 +282,8 @@ void Initialise() {
 	y = 1 * sin(radian);
 	z = sin(radian)*cos(radian);
 	colors.push_back(glm::vec3(x, y, z));
-	}*/
-	/*void mainImage( out vec4 fragColor, in vec2 fragCoord )
+	}
+	void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	{
 	vec2 p =fragCoord/iResolution.xy;
 	vec2 q=p-vec2(3.0f,3.0f);
@@ -254,6 +313,51 @@ void GameLoop() {//esto es la tarea
 	//_transform.Rotate(0.01f, 0.01f, 0.01f, true);//Rotación Global
 	//_transform.Rotate(0.01f, 0.01f, 0.01f, false);//Rotación Local
 
+	if (delta == 360){
+		delta = 0;
+	}
+	_transform.Rotate(-0.01f, -0.01f, 0.01f, true);
+
+	program.Activate();
+
+	//Geometria 1
+	mat4 matModelo = _transform.GetModelMatrix();
+	mat3 normalMatrix = transpose(inverse(mat3(_transform.GetModelMatrix())));
+	program.SetUniformMatrix("modelMatrix", matModelo);
+	program.SetUniformMatrix3("normalMatrix", normalMatrix);
+	program.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform.GetModelMatrix());
+	mesh.Draw(GL_TRIANGLES);
+
+	////Geometria 2
+	mat4 matModelo2 = _transform2.GetModelMatrix();
+	mat3 normalMatrix2 = transpose(inverse(mat3(_transform2.GetModelMatrix())));
+	program.SetUniformMatrix("modelMatrix", matModelo2);
+	program.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	program.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform2.GetModelMatrix());
+	mesh.Draw(GL_TRIANGLES);
+	
+	program.Desactivate();
+	
+	glutSwapBuffers();
+	
+	delta += 0.01f;
+	if (delta2 >= 360){
+		d2 = true;
+	}
+	if (delta2 <= -180){
+		d2 = false;
+	}
+
+	if (d2 == true){
+		delta2 -= 0.1f;
+	}
+	else{
+		delta2 += 0.1f;
+	}
+	MAN = (delta2 / 360) / 2;
+
+	/*
+	
 	// Geometría1 rota en sus tres ejes coordenados
 	_transform.Rotate(0.03f, 0.015f, 0.03f, false);
 	// Geometría1 sigue una trayectoria circular en el plano XY
@@ -266,22 +370,12 @@ void GameLoop() {//esto es la tarea
 	// Incrementar la escala de la geometría2 en el rango de 0.25 -> 1.0
 	_transform2.SetScale(0.5f + inc, 0.5f + inc, 0.5f + inc);
 	if (_transform2.GetScale().x <= 0.25f || _transform2.GetScale().x >= 1.0f) {
-		deltaEscala *= -1.0f;
+	deltaEscala *= -1.0f;
 	}
 	inc += deltaEscala;
 
-	program.Activate();
 	
-	program.SetUniformMatrix("mvplMatrix",_camera.GetViewProjection()* _transform.GetModelMatrix());
-	mesh.Draw(GL_TRIANGLES);
-
-	program.SetUniformMatrix("mvplMatrix", _camera.GetViewProjection()* _transform2.GetModelMatrix());
-	mesh.Draw(GL_TRIANGLES);
-
-	program.Desactivate();
-	
-	glutSwapBuffers();
-	/*vertsPerFrame += delta;
+	vertsPerFrame += delta;
 	if (vertsPerFrame<0.0f || vertsPerFrame>= 370.0f) {
 		delta *= -1.0f;
 	}*/
@@ -324,13 +418,12 @@ int main(int argc, char* argv[]) {
 	// Inicializar freeglut
 	// Freeglut se encargfa de crear una ventana en donde podemos dibujar Gráficas Computacionales
 	glutInit(&argc, argv);
-	glutInitContextVersion(4, 2);
-
-
+	
 	// Iniciar el contexto de OpenGL, se refiere a las capacidades de la aplicación gráfica
 	// En este caso se trabaja con el pipeline progamable
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-
+	//SOLICITANDO VERSION 4.2 DE GL 
+	glutInitContextVersion(4, 2);
 	// Freeglut nos permite configurar eventos que ocurren en la ventana
 	// Un evento que interesa es cuando alguien cierra la ventana
 	// En este caso, se deja de renderear la escena y se termina el programa
@@ -359,7 +452,7 @@ int main(int argc, char* argv[]) {
 	
 	//Config OpenGL
 	//este es el color por default en el buffer del color
-	glClearColor(1.0f, 1.0f, 3.0f, 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	
@@ -368,11 +461,7 @@ int main(int argc, char* argv[]) {
 	//No dibujar las caras de atras
 	//glEnable(GL_BACK);
 	cout << glGetString(GL_VERSION) << endl;
-	// Configurar OpenGl. Este es el color por dedault del buffer de color en el framebuffer.
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	cout << glGetString(GL_VERSION) << endl;
-
+	
 	// Configuración inicial de nuestro programa
 	Initialise();
 

@@ -25,6 +25,7 @@ public:
 	void SetUniformf(string name, float x, float y, float z);
 	void SetUniformf(string name, float x, float y, float z, float w);
 	void SetUniformMatrix(string name, mat4 matrix);
+	void SetUniformMatrix3(string name, glm::mat3 matrix);
 
 
 private:

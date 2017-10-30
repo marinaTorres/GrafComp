@@ -34,12 +34,12 @@ void Camera::SetRotation(float x, float y, float z) {
 }
 
 void Camera::MoveForward(float delta, bool world) {
-	_transform.MoveFoward(delta, world);
+	_transform.MoveForward(delta, world);
 	_viewMatrix = inverse(_transform.GetModelMatrix());
 }
 
 void Camera::MoveUp(float delta, bool world) {
-	_transform.MoveUP(delta, world);
+	_transform.MoveUp(delta, world);
 	_viewMatrix = inverse(_transform.GetModelMatrix());
 }
 

@@ -7,6 +7,7 @@ Mesh::Mesh() {
 	_vertexCount = 0;
 	_indicesBufferObject = 0;
 	_indicesCount = 0;
+	_normalVBO = 0;
 }
 
 Mesh::~Mesh() {
@@ -77,6 +78,14 @@ void Mesh::SetIndices(vector<unsigned int> indices, GLenum usage) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indicesBufferObject);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)* indices.size(), indices.data(), GL_STATIC_DRAW); 
 		glBindVertexArray(0);
+	}
+}
+
+void Mesh::SetNormalAttribute(vector<vec3> normals, GLenum usage, GLuint locationIndex){
+	if (normals.empty() || normals.size() != _vertexCount){
+		;
+	}else{
+		SetAttributeData(_normalVBO, sizeof(vec3)*normals.size(), normals.data(), usage, locationIndex, 3);
 	}
 }
 
