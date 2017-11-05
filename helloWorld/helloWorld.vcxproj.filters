@@ -66,6 +66,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Archivos de encabezado\Tarea 4</Filter>
     </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Archivos de encabezado\Tarea 4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Circle.cpp">
@@ -102,6 +105,9 @@
       <Filter>Archivos de recursos\Tarea 4</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
+      <Filter>Archivos de recursos\Tarea 4</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
       <Filter>Archivos de recursos\Tarea 4</Filter>
     </ClCompile>
   </ItemGroup>

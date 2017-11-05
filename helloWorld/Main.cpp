@@ -17,6 +17,8 @@ Autor: A01375051 Marina Fernanda Torres Gomez
 #include "ShaderProgram.h"
 #include "Transform.h"
 #include "Camera.h"
+#include "Texture2D.h"
+#include <IL/il.h>
 
 using namespace std;
 using namespace glm;
@@ -38,7 +40,12 @@ Transform _transform;
 Transform _transform2;
 Camera _camera;
 
-void Initialise() {
+//Texturas
+Texture2D _myTexture;
+Texture2D _floor;
+Texture2D _logo;
+
+void Initialize() {
 	// Creando toda la memoria una sola vez al inicio de vida de mi programa
 	// Vector de C++ es una lista de elementos, vector de glm es una matriz con muchos componentes
 	// Lista de vec2
@@ -46,15 +53,15 @@ void Initialise() {
 
 	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
 	// Arreglo de colors en el CPU
-	
+
 	vector<vec3> positions;
-	vector<vec3> colors;
+	//vector<vec3> colors;
 	vector<vec3> normals;
-
-	 //Cubo
+	vector<vec2> textures;
+	//Cubo
+	/*
 	//++++++++++++++++++++++Colors++++++++++++++++++++++\\
-
-	//Cara Frontal-MORADO
+		//Cara Frontal-MORADO
 	colors.push_back(vec3(0.545f, 0.000f, 0.545f));
 	colors.push_back(vec3(0.600f, 0.196f, 0.800f));
 	colors.push_back(vec3(0.580f, 0.000f, 0.827f));
@@ -91,7 +98,7 @@ void Initialise() {
 	colors.push_back(vec3(0.412f, 0.412f, 0.412f));
 	colors.push_back(vec3(0.467f, 0.533f, 0.600f));
 	colors.push_back(vec3(0.439f, 0.502f, 0.565f));
-	
+	*/
 
 
 	//++++++++++++++++++++++Positions++++++++++++++++++++++\\
@@ -130,14 +137,14 @@ void Initialise() {
 	positions.push_back(vec3(3.0f, -3.0f, -3.0f));//->21
 	positions.push_back(vec3(-3.0f, -3.0f, 3.0f));//->22
 	positions.push_back(vec3(-3.0f, -3.0f, -3.0f));//->23
-	
+
 	//++++++++++++++++++++++Normals++++++++++++++++++++++\\
 	//Delantera
 	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
-	
+
 	//Atras
 	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
 	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
@@ -168,42 +175,88 @@ void Initialise() {
 	normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
 	normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
 
+	//++++++++++++++++++++++Texturas++++++++++++++++++++++\\
+	//frontal
+	textures.push_back(vec2(1.0f, 0.0f));
+	textures.push_back(vec2(1.0f, 1.0f));
+	textures.push_back(vec2(0.0f, 0.0f));
+	textures.push_back(vec2(0.0f, 1.0f));
+
+	//Atras
+	textures.push_back(vec2(1.0f, 0.0f));
+	textures.push_back(vec2(1.0f, 1.0f));
+	textures.push_back(vec2(0.0f, 0.0f));
+	textures.push_back(vec2(0.0f, 1.0f));
+
+	//izquierda
+	textures.push_back(vec2(1.0f, 0.0f));
+	textures.push_back(vec2(1.0f, 1.0f));
+	textures.push_back(vec2(0.0f, 0.0f));
+	textures.push_back(vec2(0.0f, 1.0f));
+
+	//Derecha
+	textures.push_back(vec2(1.0f, 0.0f));
+	textures.push_back(vec2(1.0f, 1.0f));
+	textures.push_back(vec2(0.0f, 0.0f));
+	textures.push_back(vec2(0.0f, 1.0f));
+
+	//Superior
+	textures.push_back(vec2(1.0f, 0.0f));
+	textures.push_back(vec2(1.0f, 1.0f));
+	textures.push_back(vec2(0.0f, 0.0f));
+	textures.push_back(vec2(0.0f, 1.0f));
+
+	//Inferior
+	textures.push_back(vec2(1.0f, 0.0f));
+	textures.push_back(vec2(1.0f, 1.0f));
+	textures.push_back(vec2(0.0f, 0.0f));
+	textures.push_back(vec2(0.0f, 1.0f));
+
 	//++++++++++++++++++++++Indices y más...++++++++++++++++++++++\\
-												   	
-	vector<unsigned int> indices = {20,21,22,22,21,23,
-									0, 1, 2, 2, 1, 3,
-									8, 9, 10, 10, 9, 11,
-									4, 5, 6, 6, 5, 7,
-									12, 13, 14, 14, 13, 15,
-									16, 17, 18, 18, 17, 19,
-									};
-	
+													   	
+	vector<unsigned int> indices = 
+	{ 0, 1, 2, 2, 1, 3,
+	  4, 5, 6, 6, 5, 7,
+	  8, 9, 10, 10, 9, 11,
+	  12, 13, 14, 14, 13, 15,
+	  16, 17, 18, 18, 17, 19,
+	  20, 21, 22, 22, 21, 23 };
+
 	//Luz
 	vec3 LightColour = vec3(1.0f, 1.0f, 1.0f);
 	vec3 lSource = vec3(18.0f, 0.0f, 20.0f);
-	
+
+	//texturas
+	_myTexture.LoadTexture("colors.jpg");
+	_floor.LoadTexture("cubo_morado.jpg");
+	_logo.LoadTexture("Paramore_Logo.png");
+
 	mesh.CreateMesh(positions.size());
 	mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
-	mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
-	mesh.SetNormalAttribute(normals, GL_STATIC_DRAW, 2);
+	//mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
+	mesh.SetNormalAttribute(normals, GL_STATIC_DRAW, 1);
+	mesh.SetTexCoordAttribute(textures, GL_STATIC_DRAW, 2);
 	mesh.SetIndices(indices, GL_STATIC_DRAW);
-	
-	
+
+
 
 	program.CreateProgram();
 	program.AttachShader("Default.vert", GL_VERTEX_SHADER);
 	program.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
 	program.SetAttribute(0, "VertexPosition");
-	program.SetAttribute(1, "VertexColor");
-	program.SetAttribute(2, "VertexNormal");
+	//program.SetAttribute(1, "VertexColor");
+	program.SetAttribute(1, "VertexNormal");
+	program.SetAttribute(2, "VertexTexCoord");
 	program.LinkProgram();
-	
+
 
 	program.Activate();
 	program.SetUniformf("Resolution", 400.0f, 400.0f);
 	program.SetUniformf("LightColor", LightColour.x, LightColour.y, LightColour.z);
 	program.SetUniformf("LightPosition", lSource.x, lSource.y, lSource.z);
 	program.SetUniformf("CameraPosition", camaraPos.x, camaraPos.y, camaraPos.z);
+	program.SetUniformI("DiffuseTexture", 0);
+	program.SetUniformI("DiffuseTexture2", 1);
 
 	program.Desactivate();
 
@@ -217,23 +270,19 @@ void Initialise() {
 	/*
 	// Cambio de escala de la geometría1 a 3 veces su tamaño original en los 3 ejes
 	_transform.SetScale(3, 3, 3);
-
 	// Inicialmente la geometría2 empieza con una escala de 0.5
 	_transform2.SetScale(0.5f, 0.5f, 0.5f);
 	// La posición de la geometría2 siempre está en (0,0,0)
 	_transform2.SetPosition(0, 0, 0);
-
 	// Colocando la cámara en (0, 0, 25) para visualizar correctamente las dos geometrías
 	_camera.SetPosition(0, 0, 25);
 
-	
 	//PENTÁGONO
 	float arr[6] = { 18.f, 306.f, 234.f, 162.f, 90.f, 18.f };
 	for (int i = 0; i < 6; i++) {
 	positions.push_back(vec2(cos(radians(arr[i])), sin(radians(arr[i]))));
 	positions.push_back(vec2(3.0*cos(radians(arr[i])), 3.0*sin(radians(arr[i]))));
 	}
-
 	//Triángulo
 	//Posiciones
 	//Punta
@@ -243,24 +292,20 @@ void Initialise() {
 	positions.push_back(vec3(-1.0f, -1.0f, 1.0f));//->2
 	positions.push_back(vec3(1.0f, -1.0f, -1.0f));//->3
 	positions.push_back(vec3(-1.0f, -1.0f, -1.0f));//->4
-
 	//Colores
 	colors.push_back(vec3(0.545f, 0.000f, 0.545f));
 	colors.push_back(vec3(0.596f, 0.984f, 0.596f));
 	colors.push_back(vec3(1.000f, 0.412f, 0.706f));
 	colors.push_back(vec3(0.373f, 0.620f, 0.627f));
 	colors.push_back(vec3(0.502f, 0.502f, 0.502f));
-
 	vector<unsigned int> indices = {0,2,1,1,0,3,3,0,4,4,0,2,1,3,2,2,3,4};
-
-	//para configurar un uniform, tenemos que 
-	//decirle a openGL que vamos a utilizar 
+	//para configurar un uniform, tenemos que
+	//decirle a openGL que vamos a utilizar
 	//shader program(manage)
 	glUseProgram(shaderProgram);
 	GLint  uniformLocation = glGetUniformLocation(shaderProgram, "Resolution");
 	glUniform2f(uniformLocation,400.0f,400.0f);
 	glUseProgram(0);
-
 	positions.push_back(vec2(0.0f, 0.0f));
 	int i = 0;
 	float x, y;
@@ -271,9 +316,7 @@ void Initialise() {
 	y = 1 * sin(radian);
 	positions.push_back(vec2(x,y));
 	}
-
 	colors.push_back(glm::vec3(1.0, 1.0, 1.0));
-
 	double z;
 	i = 0;
 	for (i; i <= 360; i++) {
@@ -287,13 +330,9 @@ void Initialise() {
 	{
 	vec2 p =fragCoord/iResolution.xy;
 	vec2 q=p-vec2(3.0f,3.0f);
-
 	vec3 color=vec3(3.0f,0.0f,3.0f);
-
 	float r=0.2f+0.1f*cos(atan(q.y,q.x)*10.0f+20.0f*q.x+1.0f);
-
 	color*=smoothstep(r,r+0.1f,length(q));
-
 	r=0.015f;
 	r+=0.002*cos(120.0f*q.y);
 	r+=exp(-40.0f*p.y);
@@ -305,68 +344,78 @@ void Initialise() {
 
 void GameLoop() {//esto es la tarea
 
-	//Limpiamos el buffer de color y el buffer de profundidad
-	// Siempre hacerlo al inicio del frame
+				 //Limpiamos el buffer de color y el buffer de profundidad
+				 // Siempre hacerlo al inicio del frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//_camera.MoveForward(0.0001f);
 	//_transform.Rotate(0.01f, 0.01f, 0.01f, true);//Rotación Global
 	//_transform.Rotate(0.01f, 0.01f, 0.01f, false);//Rotación Local
 
-	if (delta == 360){
+	if (delta == 360) {
 		delta = 0;
 	}
-	_transform.Rotate(-0.01f, -0.01f, 0.01f, true);
+	_transform.Rotate(-0.01f, -0.01f, 0.01f, false);
 
 	program.Activate();
 
 	//Geometria 1
+	glActiveTexture(GL_TEXTURE0);
+	_myTexture.Bind();
+	glActiveTexture(GL_TEXTURE1);
+	_logo.Bind();
 	mat4 matModelo = _transform.GetModelMatrix();
 	mat3 normalMatrix = transpose(inverse(mat3(_transform.GetModelMatrix())));
 	program.SetUniformMatrix("modelMatrix", matModelo);
 	program.SetUniformMatrix3("normalMatrix", normalMatrix);
 	program.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform.GetModelMatrix());
 	mesh.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	_myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE1);
+	_logo.Unbind();
 
 	////Geometria 2
+	glActiveTexture(GL_TEXTURE0);
+	_floor.Bind();
 	mat4 matModelo2 = _transform2.GetModelMatrix();
 	mat3 normalMatrix2 = transpose(inverse(mat3(_transform2.GetModelMatrix())));
 	program.SetUniformMatrix("modelMatrix", matModelo2);
 	program.SetUniformMatrix3("normalMatrix", normalMatrix2);
 	program.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform2.GetModelMatrix());
 	mesh.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	_floor.Unbind();
 	
 	program.Desactivate();
-	
+
 	glutSwapBuffers();
-	
+
 	delta += 0.01f;
-	if (delta2 >= 360){
+	if (delta2 >= 360) {
 		d2 = true;
 	}
-	if (delta2 <= -180){
+	if (delta2 <= -180) {
 		d2 = false;
 	}
 
-	if (d2 == true){
+	if (d2 == true) {
 		delta2 -= 0.1f;
 	}
-	else{
+	else {
 		delta2 += 0.1f;
 	}
 	MAN = (delta2 / 360) / 2;
 
 	/*
-	
+
 	// Geometría1 rota en sus tres ejes coordenados
 	_transform.Rotate(0.03f, 0.015f, 0.03f, false);
 	// Geometría1 sigue una trayectoria circular en el plano XY
 	_transform.SetPosition(5 * cos(radians(pos)), 5 * sin(radians(pos)), 0);
 	pos += deltaCirculo;
-
 	// Geometría2 rota en sus tres ejes coordenados, pero en sentido contrario
 	_transform2.Rotate(-0.03f, -0.015f, -0.03f, false);
-
 	// Incrementar la escala de la geometría2 en el rango de 0.25 -> 1.0
 	_transform2.SetScale(0.5f + inc, 0.5f + inc, 0.5f + inc);
 	if (_transform2.GetScale().x <= 0.25f || _transform2.GetScale().x >= 1.0f) {
@@ -374,29 +423,23 @@ void GameLoop() {//esto es la tarea
 	}
 	inc += deltaEscala;
 
-	
 	vertsPerFrame += delta;
 	if (vertsPerFrame<0.0f || vertsPerFrame>= 370.0f) {
-		delta *= -1.0f;
+	delta *= -1.0f;
 	}*/
 
 	//Cuando terminamos de renderear, cambiamos los buffers
-	
+
 	/*
 	// WARNING!!!!!! ESTO ES OPENGL VIEJITO!!!!!!
-
 	glBegin(GL_TRIANGLES);
-
 	//-1 para borde izquierdo, 1 para borde derecho, 0 centro, 1 arriba, -1 abajo
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex2f(-1.0f, -1.0f); // SOlo dos coordenadas, x y y , dos puntos o z para 3D pero este no tiene profundidad
-
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex2d(1.0f, -1.0f);
-
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex2d(0.0f, 1.0f);
-
 	glEnd();*/
 }
 
@@ -415,57 +458,66 @@ void ReshapeWindow(int w, int h) {
 }
 
 int main(int argc, char* argv[]) {
-	// Inicializar freeglut
-	// Freeglut se encargfa de crear una ventana en donde podemos dibujar Gráficas Computacionales
+	//inicializa freglut
+	//este crea ventana
+	//en donde se dibuja
 	glutInit(&argc, argv);
-	
-	// Iniciar el contexto de OpenGL, se refiere a las capacidades de la aplicación gráfica
-	// En este caso se trabaja con el pipeline progamable
+	//INICIA EL CONTEXTO DE OPENGL; ESTO SON SUS CAPACIDADES GRAFICAS
+	//En este caso se usa pipeline Programable
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-	//SOLICITANDO VERSION 4.2 DE GL 
+	//SOLICITANDO VERSION 4.4 DE GL 
 	glutInitContextVersion(4, 2);
-	// Freeglut nos permite configurar eventos que ocurren en la ventana
-	// Un evento que interesa es cuando alguien cierra la ventana
-	// En este caso, se deja de renderear la escena y se termina el programa
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+	//freeglut nos permite configurar eventos que ocurren en la ventana
+	//nos interesa cuando alguien cierra la ventana, en ese caso se deja de renderear la escena.
 
-	// También configuramos frambuffer, en este caso solicitamos un buffer
-	// true color RGBA, un buffer de produndidad y un segundo buffer para renderear
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE); // Dos framebuffers
+	//configuramos el framebuffer, true color RGBA profundidad y un segundo buffer para rendereo
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
-	// Iniciar las dimensiones de la ventana (en pixeles)
+	//la ventana 
 	glutInitWindowSize(400, 400);
 
-	// Creeamos la ventana y le damos un título.
-	glutCreateWindow("Hello World!");
+	//su titulo e inicialización
+	glutCreateWindow("HELLO WORLD GL ");
 
 	glutDisplayFunc(GameLoop);
-		//asociamos una función ara el cambio de resolucion de la ventana.
-		//freeglut la va a mandar a llamar 
-		//cuando alguien cambie el tamaño de la ventana
-	glutReshapeFunc(ReshapeWindow);
 
-	//asociamos la función cuando openGL entra en estado de reposos
+	//asociamos una funicon para el cambio de resolucion de la ventana, se va amandar a llamar cuando alguien cambie el tamaño
+	glutReshapeFunc(ReshapeWindow);
 	glutIdleFunc(Idle);
-	// Inicializamos GLEW. Esta librería se encarga de obtener el API de OpenGL de nuestra tarjeta de video
+	//inicializa glew y se encarga de obtener el api de opengl de nuestra video card
 	glewInit();
-	
+
 	//Config OpenGL
 	//este es el color por default en el buffer del color
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
-	
 	//borrado de caras traseras, todos los triangulos CCW
 	//glEnable(GL_CULL_FACE);
 	//No dibujar las caras de atras
 	//glEnable(GL_BACK);
-	cout << glGetString(GL_VERSION) << endl;
-	
-	// Configuración inicial de nuestro programa
-	Initialise();
 
-	// Iniciar la aplicación. El Main se pausará en esta línea hasta que se cierre la ventana.
+	//-----------------------------------------------------------------
+	// Inicializar DevIL. Esto se debe hacer sólo una vez.
+	ilInit();
+	// Cambiar el punto de origen de las texturas. Por default, DevIL
+	// pone un punto de origen en la esquina superior izquierda.
+	// Esto es compatible con el sistema operativo, pero no con el
+	// funcionamiento de OpenGL. 
+	ilEnable(IL_ORIGIN_SET);
+	// Configurar el punto de origen de las texturas en la esquina 
+	// inferior izquierda
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	//-----------------------------------------------------------------
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//config inicial del programa.
+	Initialize();
+
+	//Inicia la aplicación, el main se pausa en esta linea hasta que se cierre la ventana
 	glutMainLoop();
 
 	return 0;

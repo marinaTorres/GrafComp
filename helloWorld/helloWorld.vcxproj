@@ -126,6 +126,7 @@
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,7 @@
     <ClCompile Include="ejerciciosBásicos.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>

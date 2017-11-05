@@ -55,6 +55,12 @@ void ShaderProgram::SetUniformf(string name, float value){
 	glUniform1f(uniformLocation, value);
 }
 
+void ShaderProgram::SetUniformI(string name, int value){
+	GLint  uniformLocation = glGetUniformLocation(_programHandle, (const GLchar*)name.c_str());
+	glUniform1i(uniformLocation, value);
+
+}
+
 void ShaderProgram::SetUniformf(string name, float x, float y){
 	GLint  uniformLocation = glGetUniformLocation(_programHandle, name.c_str());
 	glUniform2f(uniformLocation, x, y);
