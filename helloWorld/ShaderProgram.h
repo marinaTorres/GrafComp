@@ -1,8 +1,9 @@
 #pragma once
-#include <string>
+
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 #include <memory>
 #include "Shader.h"

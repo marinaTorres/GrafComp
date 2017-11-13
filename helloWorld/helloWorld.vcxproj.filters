@@ -69,6 +69,9 @@
     <ClInclude Include="Texture2D.h">
       <Filter>Archivos de encabezado\Tarea 4</Filter>
     </ClInclude>
+    <ClInclude Include="Dephtbuffer.h">
+      <Filter>Archivos de encabezado\Tarea 4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Circle.cpp">
@@ -110,6 +113,9 @@
     <ClCompile Include="Texture2D.cpp">
       <Filter>Archivos de recursos\Tarea 4</Filter>
     </ClCompile>
+    <ClCompile Include="Dephtbuffer.cpp">
+      <Filter>Archivos de recursos\Tarea 4</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Default.frag">
@@ -122,6 +128,24 @@
       <Filter>Archivos de recursos\Shaders</Filter>
     </None>
     <None Include="DiscardCenter.frag">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Depth.frag">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Depth.vert">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Shadow.frag">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Shadow.vert">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Shadow2Texturas.frag">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="Shadow2Texturas.vert">
       <Filter>Archivos de recursos\Shaders</Filter>
     </None>
   </ItemGroup>
