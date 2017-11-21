@@ -31,6 +31,10 @@ using namespace glm;
 //Animación
 float rotateFingers = 0.05f;
 float translateFingers = 0.004f;
+float rotateFingers1 = 0.055f;
+float translateFingers1 = 0.0044f;
+float rotateFingers2 = 0.0555f;
+float translateFingers2 = 0.00444f;
 int delta = 0;
 
 
@@ -368,15 +372,15 @@ void GameLoop(){
 	_transformF2B.Rotate(0.0f, 0.0f, rotateFingers, false);
 	_transformF2B.Translate(0.0f, translateFingers, 0.0f, false);
 	
-	_transformF3A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF3A.Translate(0.0f, translateFingers, 0.0f, false);
-	_transformF3B.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF3B.Translate(0.0f, translateFingers, 0.0f, false);
+	_transformF3A.Rotate(0.0f, 0.0f, rotateFingers1, false);
+	_transformF3A.Translate(0.0f, translateFingers1, 0.0f, false);
+	_transformF3B.Rotate(0.0f, 0.0f, rotateFingers1, false);
+	_transformF3B.Translate(0.0f, translateFingers1, 0.0f, false);
 	
-	_transformF4A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF4A.Translate(0.0f, translateFingers, 0.0f, false);
-	_transformF4B.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF4B.Translate(0.0f, translateFingers, 0.0f, false);
+	_transformF4A.Rotate(0.0f, 0.0f, rotateFingers2, false);
+	_transformF4A.Translate(0.0f, translateFingers2, 0.0f, false);
+	_transformF4B.Rotate(0.0f, 0.0f, rotateFingers2, false);
+	_transformF4B.Translate(0.0f, translateFingers2, 0.0f, false);
 	
 	/*
 	_transformF1A.Rotate(0.0f, 0.0f, rotateFingers, false);
@@ -393,9 +397,16 @@ void GameLoop(){
 	*/
 	
 	delta += 1;
-	if (delta%2240==0) {
+	cout << delta << endl;
+	if (delta%2000==0) {
 		rotateFingers = rotateFingers*-1.0 ;
 		translateFingers = translateFingers*-1.0;
+	}else if (delta% 2010 == 0) {
+		rotateFingers1 = rotateFingers1*-1.0;
+		translateFingers1 = translateFingers1*-1.0;
+	}else if (delta % 2020 == 0) {
+		rotateFingers2 = rotateFingers2*-1.0;
+		translateFingers2 = translateFingers2*-1.0;
 	}
 
 	_myDephtbuffer.Bind();
