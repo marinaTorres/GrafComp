@@ -19,7 +19,7 @@ public:
 	void AttachShader(string path, GLenum type);
 	void LinkProgram();
 	void Activate();
-	void Desactivate();
+	void Deactivate();
 	void SetAttribute(GLuint locationIndex, string name);
 	void SetUniformf(string name, float value);
 	void SetUniformI(string name, int value);

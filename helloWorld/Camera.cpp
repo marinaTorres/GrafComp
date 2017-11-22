@@ -73,7 +73,7 @@ void Camera::SetPerspective(float nearPlane, float farPlane, float fieldOfView, 
 	_projectionMatrix = perspective(radians(fieldOfView),aspectRatio,nearPlane,farPlane);
 }
 
-void Camera::SetOrthographic(float size, float aspectRatio) {
+void Camera::SetOrtographic(float size, float aspectRatio) {
 	float xSize = aspectRatio*size;
 	_projectionMatrix = ortho(-xSize, xSize, -size, size, -size, size);
 }

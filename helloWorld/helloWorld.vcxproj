@@ -158,6 +158,9 @@
     <None Include="Shadow2Texturas.frag" />
     <None Include="Shadow2Texturas.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="MyCode.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

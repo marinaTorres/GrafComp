@@ -1,6 +1,6 @@
 /*********************************************************
 Materia: Gráficas Computacionales
-Fecha: 10 de noviembre del 2017
+Fecha: 24 de noviembre del 2017
 Autor: A01374526 José Karlo Hurtado Corona
 Autor: A01375051 Marina Fernanda Torres Gomez
 *********************************************************/
@@ -26,539 +26,852 @@ using namespace glm;
 
 #pragma region Global Scope vars
 
+//manager al que le vamos a asociar todos los VBOs
+GLuint vao;
+
+//MANAGER DE los shaders (shaderProgram)
+GLuint shaderProgram;
+int g = 4;
+int ULTRA = g * 6;
+
+//animacion
+float vertsPerFrame = 0.0f;
+float delta = 0.0f;
+float deltaM = -15.0f;
+float deltaA = -30.0f;
+float delta2 = 0.0f;
+bool d2 = false;
+float MAN = (delta2 / 360) / 2;
+int Turbo = 130;
 
 
-//Animación
-float rotateFingers = 0.05f;
-float translateFingers = 0.004f;
-float rotateFingers1 = 0.055f;
-float translateFingers1 = 0.0044f;
-float rotateFingers2 = 0.0555f;
-float translateFingers2 = 0.00444f;
-int delta = 0;
+//Posicion de la camara
+vec3 camaraPos = vec3(0.0f, 20.0f, 50.0f);
+int CPitch = -20;
+vec3 lPos = glm::vec3(0.0f, 20.0f, 0.0f);
+vec3 camera2Pos = lPos;
 
 
 //declaro shader program y mesh
-ShaderProgram program;
-ShaderProgram program2;
-ShaderProgram program2Tex;
-Mesh _meshPalm;
-Mesh _meshFingers;
+ShaderProgram sProgram;
+ShaderProgram sProgram2;
+ShaderProgram sProgram2Texturas;
+Mesh geometria1;
+Mesh geometriaDedos;
 
-//Lo del transform
-Transform _transformFloor;//Piso
-Transform _transformPalm;//Palm
-Transform _transformF1A;//Finger 1 bottom
-Transform _transformF1B;//Finger 1 up
-Transform _transformF2A;//Finger 2 bottom
-Transform _transformF2B;//Finger 2 up
-Transform _transformF3A;//Finger 3 bottom
-Transform _transformF3B;//Finger 3 up
-Transform _transformF4A;//Finger 4 bottom
-Transform _transformF4B;//Finger 4 up
-
-
+//LO del transform
+Transform _transform;
+Transform _transform2;
 Camera _camera;
-Camera _lightCamera;
+Camera _camera2;
+//Los dedos
+Transform PPhalanx;
+Transform PMeta;
+Transform IPhalanx;
+Transform IMeta;
+Transform MPhalanx;
+Transform MMeta;
+Transform APhalanx;
+Transform AMeta;
 
 //lo de la textura
-Texture2D _back;
-Texture2D _floor;
-Texture2D _logo;
+Texture2D myTexture;
+Texture2D base;
+Texture2D cerdo;
 
 //el depth buffer
-Dephtbuffer _myDephtbuffer;
+Dephtbuffer dBuffer;
 
-void ReshapeWindow(int width, int height) {
+//se obtuvo la informacion de #pragma region de: https://msdn.microsoft.com/en-us/library/b6xkz944.aspx
+
+#pragma endregion 
+
+#pragma region Colors Vertex Normals TexCoords
+
+vector<vec3> colores()
+{
+	//COLORES Distintos para cada cara
+	std::vector<glm::vec3> colors;
+	for (int i = 0; i< ULTRA; i++)
+	{
+		if (i < g)
+		{
+			colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+		else if (i >= g && i < (g * 2))
+		{
+			colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+		}
+		else if (i >= (g * 2) && i < (g * 3))
+		{
+			colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+		else if (i >= (g * 3) && i < (g * 4))
+		{
+			colors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
+		}
+		else if (i >= (g * 4) && i < (g * 5))
+		{
+			colors.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
+		}
+		else
+		{
+			colors.push_back(glm::vec3(0.0f, 1.0f, 1.0f));
+		}
+	}
+	return colors;
+}
+
+vector<vec3> posiciones()
+{
+	//Esto es un palma
+	std::vector<glm::vec3> positions;
+	//adelante
+	positions.push_back(vec3(3.0f*2.0f, -3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, 3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, -3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, 3.0f*3.5f, 3.0f*0.5f));
+	//atras
+	positions.push_back(vec3(3.0f*2.0f, -3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, 3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, -3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, 3.0f*3.5f, -3.0f*0.5f));
+	//Derecha
+	positions.push_back(vec3(3.0f*2.0f, -3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, 3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, -3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, 3.0f*3.5f, 3.0f*0.5f));
+	//izq
+	positions.push_back(vec3(-3.0f*2.0f, -3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, 3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, -3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, 3.0f*3.5f, 3.0f*0.5f));
+	//arriba
+	positions.push_back(vec3(3.0f*2.0f, 3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, 3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, 3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, 3.0f*3.5f, -3.0f*0.5f));
+	//abajo
+	positions.push_back(vec3(3.0f*2.0f, -3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(3.0f*2.0f, -3.0f*3.5f, -3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, -3.0f*3.5f, 3.0f*0.5f));
+	positions.push_back(vec3(-3.0f*2.0f, -3.0f*3.5f, -3.0f*0.5f));
+
+	return positions;
+}
+
+vector<vec3> posicionesDedos()
+{
+	//Esto es una falange
+
+	std::vector<glm::vec3> positions;
+	//adelante
+	positions.push_back(vec3(3.0f*0.5f, -3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, 3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, -3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, 3.0f*0.8f, 3.0f*0.3f));
+	//atras
+	positions.push_back(vec3(3.0f*0.5f, -3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, 3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, -3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, 3.0f*0.8f, -3.0f*0.3f));
+	//Derecha
+	positions.push_back(vec3(3.0f*0.5f, -3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, 3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, -3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, 3.0f*0.8f, 3.0f*0.3f));
+	//izq
+	positions.push_back(vec3(-3.0f*0.5f, -3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, 3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, -3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, 3.0f*0.8f, 3.0f*0.3f));
+	//arriba
+	positions.push_back(vec3(3.0f*0.5f, 3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, 3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, 3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, 3.0f*0.8f, -3.0f*0.3f));
+	//abajo
+	positions.push_back(vec3(3.0f*0.5f, -3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(3.0f*0.5f, -3.0f*0.8f, -3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, -3.0f*0.8f, 3.0f*0.3f));
+	positions.push_back(vec3(-3.0f*0.5f, -3.0f*0.8f, -3.0f*0.3f));
+
+	return positions;
+}
+
+vector<vec3> normales()
+{
+	std::vector<glm::vec3> normals;
+	//Delantera
+	for (int i = 0; i < 4; i++)
+	{
+		normals.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	}
+	//atras
+	for (int i = 0; i < 4; i++)
+	{
+		normals.push_back(glm::vec3(0.0f, 0.0f, -1.0f));
+	}
+	//derecha
+	for (int i = 0; i < 4; i++)
+	{
+		normals.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	}
+	//izq
+	for (int i = 0; i < 4; i++)
+	{
+		normals.push_back(glm::vec3(-1.0f, 0.0f, 0.0f));
+	}
+	//arriba
+	for (int i = 0; i < 4; i++)
+	{
+		normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+	//abajo
+	for (int i = 0; i < 4; i++)
+	{
+		normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+	}
+	return normals;
+}
+
+vector<vec2> TexCoords()
+{
+	std::vector<glm::vec2> texcoords;
+
+	for (int i = 0; i<6; i++)
+	{
+		texcoords.push_back(vec2(1.0f, 0.0f));
+		texcoords.push_back(vec2(1.0f, 1.0f));
+		texcoords.push_back(vec2(0.0f, 0.0f));
+		texcoords.push_back(vec2(0.0f, 1.0f));
+	}
+
+	return texcoords;
+}
+
+#pragma endregion 
+
+void Initialize()
+{
+	//---------+-----------------------------------------------+-------------
+	// creando toda la memoria una sola vez al inicio de la vida del programa.
+	//los indices
+	vector<unsigned int> indices = { 0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7, 8, 9, 10, 10, 9, 11, 12, 13, 14, 14, 13, 15, 16, 17, 18, 18, 17, 19, 20,21,22,22,21,23 };
+
+	//Cosas de Luz -------------------------------+------------------+-------
+	vec3 LightColour = glm::vec3(1.0f, 1.0f, 1.0f);
+	vec3 lSource = lPos;
+
+	//textura
+	myTexture.LoadTexture("colors.jpg");
+	base.LoadTexture("cubo_morado.jpg");
+	cerdo.LoadTexture("Paramore_Logo.png");
+
+	//queremos generar un manager
+	geometria1.CreateMesh((GLint)ULTRA);
+	geometria1.SetPositionAttribute(posiciones(), GL_STATIC_DRAW, 0);
+	geometria1.SetColorAttribute(colores(), GL_STATIC_DRAW, 1);
+	geometria1.SetNormalAttribute(normales(), GL_STATIC_DRAW, 2);
+	geometria1.SetTexCoordAttribute(TexCoords(), GL_STATIC_DRAW, 3);
+	geometria1.SetIndices(indices, GL_STATIC_DRAW);
+
+	//Desactivamos el MNGR 
+	glBindVertexArray(0);
+
+	//queremos generar otro manager
+	geometriaDedos.CreateMesh((GLint)ULTRA);
+	geometriaDedos.SetPositionAttribute(posicionesDedos(), GL_STATIC_DRAW, 0);
+	geometriaDedos.SetColorAttribute(colores(), GL_STATIC_DRAW, 1);
+	geometriaDedos.SetNormalAttribute(normales(), GL_STATIC_DRAW, 2);
+	geometriaDedos.SetTexCoordAttribute(TexCoords(), GL_STATIC_DRAW, 3);
+	geometriaDedos.SetIndices(indices, GL_STATIC_DRAW);
+
+	//Desactivamos el MNGR 
+	glBindVertexArray(0);
+
+	//-------------------------------------------------------------1
+	sProgram2.CreateProgram();
+
+	//Vertex shader 
+	//-----------------------------------------
+	sProgram2.AttachShader("Depth.vert", GL_VERTEX_SHADER);
+	sProgram2.AttachShader("Depth.frag", GL_FRAGMENT_SHADER);
+	sProgram2.SetAttribute(0, "VertexPosition");
+	sProgram2.LinkProgram();
+
+	//-------------------------------------------------------------1
+
+	//-------------------------------------------------------------2
+	//Vertex shader 
+	//-----------------------------------------
+	sProgram.CreateProgram();
+	sProgram.AttachShader("Shadow.vert", GL_VERTEX_SHADER);
+	sProgram.AttachShader("Shadow.frag", GL_FRAGMENT_SHADER);
+	sProgram.SetAttribute(0, "VertexPosition");
+	sProgram.SetAttribute(1, "VertexColor");
+	sProgram.SetAttribute(2, "VertexNormal");
+	sProgram.SetAttribute(3, "VertexTexCoord");
+
+	//se cheka compatibilidad man
+	sProgram.LinkProgram();
+
+	sProgram.Activate();
+	sProgram.SetUniformf("Resolution", 400.0f, 400.0f);
+	sProgram.SetUniformf("LightColor", LightColour.x, LightColour.y, LightColour.z);
+	sProgram.SetUniformf("LightPosition", lSource.x, lSource.y, lSource.z);
+	sProgram.SetUniformf("CameraPosition", camaraPos.x, camaraPos.y, camaraPos.z);
+
+	sProgram.SetUniformI("DiffuseTexture", 0);
+	sProgram.SetUniformI("DiffuseTexture2", 1);
+	sProgram.SetUniformI("ShadowMap", 2);
+
+	sProgram.Deactivate();
+	//-------------------------------------------------------------2
+
+	//-------------------------------------------------------------3
+	//Vertex shader 
+	//-----------------------------------------
+	sProgram2Texturas.CreateProgram();
+	sProgram2Texturas.AttachShader("Shadow2Texturas.vert", GL_VERTEX_SHADER);
+	sProgram2Texturas.AttachShader("Shadow2Texturas.frag", GL_FRAGMENT_SHADER);
+	sProgram2Texturas.SetAttribute(0, "VertexPosition");
+	sProgram2Texturas.SetAttribute(1, "VertexColor");
+	sProgram2Texturas.SetAttribute(2, "VertexNormal");
+	sProgram2Texturas.SetAttribute(3, "VertexTexCoord");
+
+	//se cheka compatibilidad man
+	sProgram2Texturas.LinkProgram();
+
+	sProgram2Texturas.Activate();
+	sProgram2Texturas.SetUniformf("Resolution", 400.0f, 400.0f);
+	sProgram2Texturas.SetUniformf("LightColor", LightColour.x, LightColour.y, LightColour.z);
+	sProgram2Texturas.SetUniformf("LightPosition", lSource.x, lSource.y, lSource.z);
+	sProgram2Texturas.SetUniformf("CameraPosition", camaraPos.x, camaraPos.y, camaraPos.z);
+
+	sProgram2Texturas.SetUniformI("DiffuseTexture", 0);
+	sProgram2Texturas.SetUniformI("DiffuseTexture2", 1);
+	sProgram2Texturas.SetUniformI("ShadowMap", 2);
+
+	sProgram2Texturas.Deactivate();
+	//-------------------------------------------------------------3
+
+
+#pragma region Transforms
+
+	_camera.SetPosition(camaraPos.x, camaraPos.y, camaraPos.z);
+	_camera2.SetPosition(camera2Pos.x, camera2Pos.y, camera2Pos.z);
+	_camera2.Pitch(-90);
+	_camera.Pitch(CPitch);
+	_camera2.SetOrtographic(100.0f, 1.0f);
+
+	_transform.SetRotation(-45.0f, 0.0f, 0.0f);
+	_transform2.SetScale(30.0f, 0.5f, 30.0f);
+	_transform2.SetPosition(0.0f, -15.0f, 0.0f);
+	_transform2.SetRotation(0.0f, 0.0f, 0.0f);
+
+	PPhalanx.SetPosition(10.0f, -6.0f, 0.0f);
+	PMeta.SetPosition(0.0f, 6.0f, 0.0f);
+	IPhalanx.SetPosition(0.0f, 14.0f, 0.0f);
+	IMeta.SetPosition(0.0f, 6.0f, 0.0f);
+	MPhalanx.SetPosition(-4.5f, 14.0f, 0.0f);
+	MMeta.SetPosition(0.0f, 6.0f, 0.0f);
+	APhalanx.SetPosition(4.5f, 14.0f, 0.0f);
+	AMeta.SetPosition(0.0f, 6.0f, 0.0f);
+
+	PPhalanx.SetRotation(0.0f, 0.0f, -70.0f);
+
+#pragma endregion 
+
+	dBuffer.Create(2048);
+}
+
+#pragma region MoverCosas
+
+//Pulgar-------------------------------------------------
+void moverPulgar2()
+{
+	if (delta < Turbo * 2)
+	{
+		PMeta.Rotate(0.04f, 0.0f, 0.0f, false);
+		PMeta.MoveForward(0.0025f, false);
+	}
+	else if (delta > Turbo * 3 && delta < Turbo * 4)
+	{
+		PMeta.Rotate(-0.08f, 0.0f, 0.0f, false);
+		PMeta.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		PMeta.Rotate(0.0f, 0.0f, 0.0f, false);
+		PMeta.MoveForward(0.00f, false);
+	}
+}
+
+void moverPulgar()
+{
+	if (delta < Turbo)
+	{
+		PPhalanx.Rotate(0.05f, 0.0f, 0.0f, false);
+		PPhalanx.MoveForward(0.005f, false);
+	}
+	else if (delta < Turbo * 3 && delta > Turbo)
+	{
+		PPhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		PPhalanx.MoveForward(0.00f, false);
+	}
+	else if (delta > Turbo * 3 && delta < Turbo * 4)
+	{
+		PPhalanx.Rotate(-0.05f, 0.0f, 0.0f, false);
+		PPhalanx.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		PPhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		PPhalanx.MoveForward(0.00f, false);
+	}
+	moverPulgar2();
+}
+
+//Medio-------------------------------------------------
+void moverIndice2()
+{
+	if (deltaM < Turbo * 2 && deltaM > 0.0f)
+	{
+		IMeta.Rotate(0.04f, 0.0f, 0.0f, false);
+		IMeta.MoveForward(0.0025f, false);
+	}
+	else if (deltaM > Turbo * 3 && deltaM < (Turbo * 4))
+	{
+		IMeta.Rotate(-0.08f, 0.0f, 0.0f, false);
+		IMeta.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		IMeta.Rotate(0.0f, 0.0f, 0.0f, false);
+		IMeta.MoveForward(0.00f, false);
+	}
+}
+
+void moverIndice()
+{
+	if (deltaM < Turbo && deltaM > 0.0f)
+	{
+		IPhalanx.Rotate(0.05f, 0.0f, 0.0f, false);
+		IPhalanx.MoveForward(0.005f, false);
+	}
+	else if (deltaM < Turbo * 3 && deltaM > Turbo)
+	{
+		IPhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		IPhalanx.MoveForward(0.00f, false);
+	}
+	else if (deltaM > Turbo * 3 && deltaM < Turbo * 4)
+	{
+		IPhalanx.Rotate(-0.05f, 0.0f, 0.0f, false);
+		IPhalanx.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		IPhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		IPhalanx.MoveForward(0.00f, false);
+	}
+	moverIndice2();
+}
+
+//Anular-------------------------------------------------
+void moverMedio2()
+{
+	if (deltaA < Turbo * 2 && deltaA > 0.0f)
+	{
+		MMeta.Rotate(0.04f, 0.0f, 0.0f, false);
+		MMeta.MoveForward(0.0025f, false);
+	}
+	else if (deltaA > Turbo * 3 && deltaA < (Turbo * 4))
+	{
+		MMeta.Rotate(-0.08f, 0.0f, 0.0f, false);
+		MMeta.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		MMeta.Rotate(0.0f, 0.0f, 0.0f, false);
+		MMeta.MoveForward(0.00f, false);
+	}
+}
+
+void moverMedio()
+{
+	if (deltaA < Turbo && deltaA > 0.0f)
+	{
+		MPhalanx.Rotate(0.05f, 0.0f, 0.0f, false);
+		MPhalanx.MoveForward(0.005f, false);
+	}
+	else if (deltaA < Turbo * 3 && deltaA > Turbo)
+	{
+		MPhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		MPhalanx.MoveForward(0.00f, false);
+	}
+	else if (deltaA > Turbo * 3 && deltaA < Turbo * 4)
+	{
+		MPhalanx.Rotate(-0.05f, 0.0f, 0.0f, false);
+		MPhalanx.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		MPhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		MPhalanx.MoveForward(0.00f, false);
+	}
+	moverMedio2();
+}
+
+//Indice-------------------------------------------------
+void moverAnular2()
+{
+	if (delta < Turbo * 2)
+	{
+		AMeta.Rotate(0.04f, 0.0f, 0.0f, false);
+		AMeta.MoveForward(0.0025f, false);
+	}
+	else if (delta > Turbo * 3 && delta < Turbo * 4)
+	{
+		AMeta.Rotate(-0.08f, 0.0f, 0.0f, false);
+		AMeta.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		AMeta.Rotate(0.0f, 0.0f, 0.0f, false);
+		AMeta.MoveForward(0.00f, false);
+	}
+}
+
+void moverAnular()
+{
+	if (delta < Turbo)
+	{
+		APhalanx.Rotate(0.05f, 0.0f, 0.0f, false);
+		APhalanx.MoveForward(0.005f, false);
+	}
+	else if (delta < Turbo * 3 && delta > Turbo)
+	{
+		APhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		APhalanx.MoveForward(0.00f, false);
+	}
+	else if (delta > Turbo * 3 && delta < Turbo * 4)
+	{
+		APhalanx.Rotate(-0.05f, 0.0f, 0.0f, false);
+		APhalanx.MoveForward(-0.005f, false);
+	}
+	else
+	{
+		APhalanx.Rotate(0.0f, 0.0f, 0.0f, false);
+		APhalanx.MoveForward(0.00f, false);
+	}
+	moverAnular2();
+}
+
+#pragma endregion 
+
+void GameLoop()
+{
+	if (delta >= Turbo * 5)
+	{
+		delta = 0;
+		deltaM = -15;
+		deltaA = -30;
+	}
+
+	//TRANSFORMS 
+	_transform.Rotate(0.0, -0.02f, 0.0f, true);
+	//DEDOS------------------------------------------------
+	moverPulgar();
+	moverIndice();
+	moverMedio();
+	moverAnular();
+	//------------------------------------------------
+
+	//1er Render------------------------------------------
+	dBuffer.Bind();
+	//dBuffer.BindDepthMap();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//Palma 
+	sProgram2.Activate();
+	mat4 matModelo = _transform.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo);
+	geometria1.Draw(GL_TRIANGLES);
+	//base
+	mat4 matModelo2 = _transform2.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo2);
+	geometria1.Draw(GL_TRIANGLES);
+
+#pragma region dedos
+
+	//Pulgar posterior 
+	matModelo2 = PPhalanx.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * matModelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+	//pulgar anterior
+	mat4 matModelo22 = PMeta.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection()  * matModelo * matModelo2 * matModelo22);
+	geometriaDedos.Draw(GL_TRIANGLES);
+
+	//indice posterior
+	mat4 mat4Modelo2 = IPhalanx.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * mat4Modelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+	//indice anterior
+	matModelo2 = IMeta.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * mat4Modelo2 * matModelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+
+	//medio posteriror
+	mat4Modelo2 = MPhalanx.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * mat4Modelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+	//medio anterior
+	matModelo2 = MMeta.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * mat4Modelo2 * matModelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+
+	//anular posterior
+	mat4Modelo2 = APhalanx.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * mat4Modelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+	//anular anterior
+	matModelo2 = AMeta.GetModelMatrix();
+	sProgram2.SetUniformMatrix("mvpMatrix", _camera2.GetViewProjection() * matModelo * mat4Modelo2 * matModelo2);
+	geometriaDedos.Draw(GL_TRIANGLES);
+
+#pragma endregion 
+
+	sProgram2.Deactivate();
+	//dBuffer.UnbindDepthMap();
+	dBuffer.Unbind();
+	glViewport(0, 0, 400, 400);
+
+	//2do Render------------------------------------------
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	sProgram2Texturas.Activate();
+
+	//EGeometria 1
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE1);
+	cerdo.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	mat4 matModelo3 = _transform.GetModelMatrix();
+	mat3 normalMatrix = glm::transpose(glm::inverse(mat3(_transform.GetModelMatrix())));
+	sProgram2Texturas.SetUniformMatrix("modelMatrix", matModelo3);
+	sProgram2Texturas.SetUniformMatrix3("normalMatrix", normalMatrix);
+	sProgram2Texturas.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform.GetModelMatrix());
+	sProgram2Texturas.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometria1.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE1);
+	cerdo.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram2Texturas.Deactivate();
+
+	sProgram.Activate();
+	////EGeometria 2
+	glActiveTexture(GL_TEXTURE0);
+	base.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	mat4 matModelo21 = _transform2.GetModelMatrix();
+	mat3 normalMatrix2 = glm::transpose(glm::inverse(mat3(_transform2.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo21);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform2.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+
+	geometria1.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	base.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+#pragma region DEDOS2
+
+	//Pulgar posterior 
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	mat4 matModeloPul = matModelo3 * PPhalanx.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModelo3 * PPhalanx.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModeloPul);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * matModelo3 * PPhalanx.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//pulgar anterior
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	matModelo21 = matModeloPul * PMeta.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModeloPul * PMeta.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo21);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * matModeloPul * PMeta.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//indice posterior
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	mat4 matModelo210 = matModelo3 * IPhalanx.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModelo3 * IPhalanx.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo210);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * matModelo3 * IPhalanx.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//indice anterior
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	matModelo21 = matModelo210 * IMeta.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModelo210 * IMeta.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo21);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * matModelo210 *  IMeta.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//medio posteriror
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	mat4  matModo21 = matModelo3 * MPhalanx.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModelo3 * MPhalanx.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModo21);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() *matModelo3 *  MPhalanx.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//medio anterior
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	matModelo21 = matModo21 * MMeta.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModo21 * MMeta.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo21);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() *matModo21 *  MMeta.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//anular posteriror
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	mat4 matModelo214 = matModelo3 * APhalanx.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModelo3 * APhalanx.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo214);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * matModelo3 * APhalanx.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+	//anular anterior
+	sProgram.Activate();
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Bind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.BindDepthMap();
+	matModelo21 = matModelo214 * AMeta.GetModelMatrix();
+	normalMatrix2 = glm::transpose(glm::inverse(mat3(matModelo214 * AMeta.GetModelMatrix())));
+	sProgram.SetUniformMatrix("modelMatrix", matModelo21);
+	sProgram.SetUniformMatrix3("normalMatrix", normalMatrix2);
+	sProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * matModelo214 * AMeta.GetModelMatrix());
+	sProgram.SetUniformMatrix("LightVPMatrix", _camera2.GetViewProjection());
+	geometriaDedos.Draw(GL_TRIANGLES);
+	glActiveTexture(GL_TEXTURE0);
+	myTexture.Unbind();
+	glActiveTexture(GL_TEXTURE2);
+	dBuffer.UnbindDepthMap();
+	sProgram.Deactivate();
+
+#pragma endregion
+
+	//Cuando terminamos de renderear, cambiampos buffers
+	glutSwapBuffers();
+	delta += 0.1f;
+	deltaM += 0.1f;
+	deltaA += 0.1f;
+}
+
+void ReshapeWindow(int width, int height)
+{
 	glViewport(0, 0, width, height);
 }
 
-vector <vec3> createPositions(float x, float y, float z) {
-	vector<vec3> positions;
-	//++++++++++++++++++++++Positions++++++++++++++++++++++\\
-		//Cara Frontal
-	positions.push_back(vec3(x, -y, z));//->0
-	positions.push_back(vec3(x, y, z));//->1
-	positions.push_back(vec3(-x, -y, z));//->2
-	positions.push_back(vec3(-x, y, z));//->3
-
-	//Cara Posterior
-	positions.push_back(vec3(x, -y, -z));//->4
-	positions.push_back(vec3(x, y, -z));//->5
-	positions.push_back(vec3(-x, -y, -z));//->6
-	positions.push_back(vec3(-x, y, -z));//->7
-
-	//Cara Lateral Derecha
-	positions.push_back(vec3(x, -y, -z));//->8
-	positions.push_back(vec3(x, y, -z));//->9
-	positions.push_back(vec3(x, -y, z));//->10
-	positions.push_back(vec3(x, y, z));//->11
-
-	//Cara Lateral Izquierda
-	positions.push_back(vec3(-x, -y, -z));//->12
-	positions.push_back(vec3(-x, y, -z));//->13
-	positions.push_back(vec3(-x, -y, z));//->14
-	positions.push_back(vec3(-x, y, z));//->15
-
-	 //Cara Superior
-	positions.push_back(vec3(x, y, z));//->16
-	positions.push_back(vec3(x, y, -z));//->17
-	positions.push_back(vec3(-x, y, z));//->18
-	positions.push_back(vec3(-x, y, -z));//->19
-
-	//Cara Inferior
-	positions.push_back(vec3(x, -y, z));//->20
-	positions.push_back(vec3(x, -y, -z));//->21
-	positions.push_back(vec3(-x, -y, z));//->22
-	positions.push_back(vec3(-x, -y, -z));//->23
-
-	return positions;
-
-}
-void Initialize() {
-	// Creando toda la memoria una sola vez al inicio de vida de mi programa
-	// Vector de C++ es una lista de elementos, vector de glm es una matriz con muchos componentes
-	// Lista de vec2
-	// Claramente estamos trabajando en el CPU y RAM
-
-	// Tantos colores por número de vertices tengas, si un vértice tiene un atributo, todos deben tenerlo
-	// Arreglo de colors en el CPU
-
-	vector<vec3> positionsFather= createPositions(13.0f,1.0f,13.0f);
-	vector<vec3> positionsChild = createPositions(5.0f,1.0f,3.0f);
-	vector<vec3> colors;
-	vector<vec3> normals;
-	vector<vec2> textures;
-	//Cubo
-	
-	//++++++++++++++++++++++Colors++++++++++++++++++++++\\
-	//Cara Frontal-MORADO
-	colors.push_back(vec3(0.545f, 0.000f, 0.545f));
-	colors.push_back(vec3(0.600f, 0.196f, 0.800f));
-	colors.push_back(vec3(0.580f, 0.000f, 0.827f));
-	colors.push_back(vec3(0.541f, 0.169f, 0.886f));
-	//Cara Lateral Izquierda-VERDE
-	colors.push_back(vec3(0.596f, 0.984f, 0.596f));
-	colors.push_back(vec3(0.565f, 0.933f, 0.565f));
-	colors.push_back(vec3(0.000f, 0.980f, 0.604f));
-	colors.push_back(vec3(0.000f, 1.000f, 0.498f));
-	//Cara posterior-ROSA
-	colors.push_back(vec3(1.000f, 0.412f, 0.706f));
-	colors.push_back(vec3(1.000f, 0.078f, 0.576f));
-	colors.push_back(vec3(0.780f, 0.082f, 0.522f));
-	colors.push_back(vec3(0.859f, 0.439f, 0.576f));
-	//Cara lateral Derecha-NARANJA
-	colors.push_back(vec3(1.000f, 0.627f, 0.478f));
-	colors.push_back(vec3(1.000f, 0.498f, 0.314f));
-	colors.push_back(vec3(1.000f, 0.388f, 0.278f));
-	colors.push_back(vec3(1.000f, 0.271f, 0.000f));
-	//cara Superior-AZUL
-	colors.push_back(vec3(0.373f, 0.620f, 0.627f));
-	colors.push_back(vec3(0.275f, 0.510f, 0.706f));
-	colors.push_back(vec3(0.690f, 0.769f, 0.871f));
-	colors.push_back(vec3(0.690f, 0.878f, 0.902f));
-	//cara Inferior-GRIS
-	colors.push_back(vec3(0.502f, 0.502f, 0.502f));
-	colors.push_back(vec3(0.412f, 0.412f, 0.412f));
-	colors.push_back(vec3(0.467f, 0.533f, 0.600f));
-	colors.push_back(vec3(0.439f, 0.502f, 0.565f));
-	
-
-	
-
-	//++++++++++++++++++++++Normals++++++++++++++++++++++\\
-	//Delantera
-	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
-	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
-	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
-	normals.push_back(vec3(0.0f, 0.0f, 1.0f));
-
-	//Atras
-	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
-	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
-	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
-	normals.push_back(vec3(0.0f, 0.0f, -1.0f));
-
-	//Derecha
-	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
-	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
-	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
-	normals.push_back(vec3(1.0f, 0.0f, 0.0f));
-
-	//izquierda
-	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
-	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
-	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
-	normals.push_back(vec3(-1.0f, 0.0f, 0.0f));
-
-	//Arriba
-	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
-	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
-	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
-	normals.push_back(vec3(0.0f, 1.0f, 0.0f));
-
-	//Abajo
-	normals.push_back(vec3(0.0f, -1.0f, 0.0f));
-	normals.push_back(vec3(0.0f, -1.0f, 0.0f));
-	normals.push_back(vec3(0.0f, -1.0f, 0.0f));
-	normals.push_back(vec3(0.0f, -1.0f, 0.0f));
-
-	//++++++++++++++++++++++Texturas++++++++++++++++++++++\\
-		//frontal
-	textures.push_back(vec2(1.0f, 0.0f));
-	textures.push_back(vec2(1.0f, 1.0f));
-	textures.push_back(vec2(0.0f, 0.0f));
-	textures.push_back(vec2(0.0f, 1.0f));
-
-	//Atras
-	textures.push_back(vec2(1.0f, 0.0f));
-	textures.push_back(vec2(1.0f, 1.0f));
-	textures.push_back(vec2(0.0f, 0.0f));
-	textures.push_back(vec2(0.0f, 1.0f));
-
-	//izquierda
-	textures.push_back(vec2(1.0f, 0.0f));
-	textures.push_back(vec2(1.0f, 1.0f));
-	textures.push_back(vec2(0.0f, 0.0f));
-	textures.push_back(vec2(0.0f, 1.0f));
-
-	//Derecha
-	textures.push_back(vec2(1.0f, 0.0f));
-	textures.push_back(vec2(1.0f, 1.0f));
-	textures.push_back(vec2(0.0f, 0.0f));
-	textures.push_back(vec2(0.0f, 1.0f));
-
-	//Superior
-	textures.push_back(vec2(1.0f, 0.0f));
-	textures.push_back(vec2(1.0f, 1.0f));
-	textures.push_back(vec2(0.0f, 0.0f));
-	textures.push_back(vec2(0.0f, 1.0f));
-
-	//Inferior
-	textures.push_back(vec2(1.0f, 0.0f));
-	textures.push_back(vec2(1.0f, 1.0f));
-	textures.push_back(vec2(0.0f, 0.0f));
-	textures.push_back(vec2(0.0f, 1.0f));
-
-	//++++++++++++++++++++++Indices y más...++++++++++++++++++++++\\
-
-	vector<unsigned int> indices =
-	{ 0, 1, 2, 2, 1, 3,
-		4, 5, 6, 6, 5, 7,
-		8, 9, 10, 10, 9, 11,
-		12, 13, 14, 14, 13, 15,
-		16, 17, 18, 18, 17, 19,
-		20, 21, 22, 22, 21, 23 };
-
-	//Luz
-	vec3 LightColour = vec3(1.0f, 1.0f, 1.0f);
-	vec3 lSource = vec3(0.0f, 20.0f, 0.0f);
-
-	//textura
-	_back.LoadTexture("colors.jpg");
-	_floor.LoadTexture("cubo_morado.jpg");
-	_logo.LoadTexture("Paramore_Logo.png");
-
-	
-	_meshPalm.CreateMesh(positionsFather.size());
-	_meshPalm.SetPositionAttribute(positionsFather, GL_STATIC_DRAW, 0);
-	_meshPalm.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
-	_meshPalm.SetNormalAttribute(normals, GL_STATIC_DRAW, 2);
-	_meshPalm.SetTexCoordAttribute(textures, GL_STATIC_DRAW, 3);
-	_meshPalm.SetIndices(indices, GL_STATIC_DRAW);
-
-	_meshFingers.CreateMesh(positionsChild.size());
-	_meshFingers.SetPositionAttribute(positionsChild, GL_STATIC_DRAW, 0);
-	_meshFingers.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
-	_meshFingers.SetNormalAttribute(normals, GL_STATIC_DRAW, 2);
-	_meshFingers.SetTexCoordAttribute(textures, GL_STATIC_DRAW, 3);
-	_meshFingers.SetIndices(indices, GL_STATIC_DRAW);
-
-	
-	program2.CreateProgram();
-	program2.AttachShader("Depth.vert", GL_VERTEX_SHADER);
-	program2.AttachShader("Depth.frag", GL_FRAGMENT_SHADER);
-	program2.SetAttribute(0, "VertexPosition");
-	program2.LinkProgram();
-
-	
-	program.CreateProgram();
-	program.AttachShader("Shadow.vert", GL_VERTEX_SHADER);
-	program.AttachShader("Shadow.frag", GL_FRAGMENT_SHADER);
-	program.SetAttribute(0, "VertexPosition");
-	program.SetAttribute(1, "VertexColor");
-	program.SetAttribute(2, "VertexNormal");
-	program.SetAttribute(3, "VertexTexCoord");
-	program.LinkProgram();
-
-	program.Activate();
-	program.SetUniformf("Resolution", 400.0f, 400.0f);
-	program.SetUniformf("LightColor", LightColour.x, LightColour.y, LightColour.z);
-	program.SetUniformf("LightPosition", lSource.x, lSource.y, lSource.z);
-	program.SetUniformf("CameraPosition", 0.0f, 20.0f, 50.0f);
-	program.SetUniformI("DiffuseTexture", 0);
-	program.SetUniformI("DiffuseTexture2", 1);
-	program.SetUniformI("ShadowMap", 2);
-	program.Desactivate();
-	
-	program2Tex.CreateProgram();
-	program2Tex.AttachShader("Shadow2Texturas.vert", GL_VERTEX_SHADER);
-	program2Tex.AttachShader("Shadow2Texturas.frag", GL_FRAGMENT_SHADER);
-	program2Tex.SetAttribute(0, "VertexPosition");
-	program2Tex.SetAttribute(1, "VertexColor");
-	program2Tex.SetAttribute(2, "VertexNormal");
-	program2Tex.SetAttribute(3, "VertexTexCoord");
-
-	program2Tex.LinkProgram();
-
-	program2Tex.Activate();
-	program2Tex.SetUniformf("Resolution", 400.0f, 400.0f);
-	program2Tex.SetUniformf("LightColor", LightColour.x, LightColour.y, LightColour.z);
-	program2Tex.SetUniformf("LightPosition", lSource.x, lSource.y, lSource.z);
-	program2Tex.SetUniformf("CameraPosition", 0.0f, 20.0f, 50.0f);
-
-	program2Tex.SetUniformI("DiffuseTexture", 0);
-	program2Tex.SetUniformI("DiffuseTexture2", 1);
-	program2Tex.SetUniformI("ShadowMap", 2);
-
-	program2Tex.Desactivate();
-
-
-	//Camaras
-	_camera.SetPosition(0.0f, 20.0f, 70.0f);
-	_camera.Pitch(-20);
-	_lightCamera.SetPosition(0.0f, 20.0f, 0.0f);
-	_lightCamera.Pitch(-90);
-	_lightCamera.SetOrthographic(100.0f, 1.0f);
-
-	//Cubo padre
-	_transformPalm.SetRotation(0.0f, 0.0f, 30.0f);
-	
-
-	//Cubo hijos
-	//rotación pulgares
-	_transformF1A.SetPosition(0.0f, 0.0f, 19.0f);
-	_transformF1A.SetRotation(0.0f, 270.0f, 0.0f);
-	_transformF1B.SetPosition(11.0f, 0.0f, 0.0f);
-	
-	_transformF2A.SetPosition(19.0f, 0.0f, 9.5f);
-	_transformF2B.SetPosition(11.0f, 0.0f, 0.0f);
-	
-	_transformF3A.SetPosition(19.0f, 0.0f, 0.0f);
-	_transformF3B.SetPosition(11.0f, 0.0f, 0.0f);
-	
-	_transformF4A.SetPosition(19.0f, 0.0f, -9.5f);
-	_transformF4B.SetPosition(11.0f, 0.0f, 0.0f);
-
-	//Piso
-	_transformFloor.SetScale(30.0f, 0.5f, 30.0f);
-	_transformFloor.SetPosition(0.0f, -15.0f, 0.0f);
-
-	_myDephtbuffer.Create(2048);
-
-}
-
-void GameLoop(){
-	
-	_transformPalm.Rotate(0.05f, 0.05f, 0.0f, false);
-	
-	_transformF1A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF1A.Translate(0.0f, translateFingers, 0.0f, false);
-	_transformF1B.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF1B.Translate(0.0f, translateFingers, 0.0f, false);
-	
-	_transformF2A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF2A.Translate(0.0f, translateFingers, 0.0f, false);
-	_transformF2B.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF2B.Translate(0.0f, translateFingers, 0.0f, false);
-	
-	_transformF3A.Rotate(0.0f, 0.0f, rotateFingers1, false);
-	_transformF3A.Translate(0.0f, translateFingers1, 0.0f, false);
-	_transformF3B.Rotate(0.0f, 0.0f, rotateFingers1, false);
-	_transformF3B.Translate(0.0f, translateFingers1, 0.0f, false);
-	
-	_transformF4A.Rotate(0.0f, 0.0f, rotateFingers2, false);
-	_transformF4A.Translate(0.0f, translateFingers2, 0.0f, false);
-	_transformF4B.Rotate(0.0f, 0.0f, rotateFingers2, false);
-	_transformF4B.Translate(0.0f, translateFingers2, 0.0f, false);
-	
-	/*
-	_transformF1A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF1B.Rotate(0.0f, 0.0f, rotateFingers, false);
-
-	_transformF2A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF2B.Rotate(0.0f, 0.0f, rotateFingers, false);
-
-	_transformF3A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF3B.Rotate(0.0f, 0.0f, rotateFingers, false);
-
-	_transformF4A.Rotate(0.0f, 0.0f, rotateFingers, false);
-	_transformF4B.Rotate(0.0f, 0.0f, rotateFingers, false);
-	*/
-	
-	delta += 1;
-	cout << delta << endl;
-	if (delta%2000==0) {
-		rotateFingers = rotateFingers*-1.0 ;
-		translateFingers = translateFingers*-1.0;
-	}else if (delta% 2010 == 0) {
-		rotateFingers1 = rotateFingers1*-1.0;
-		translateFingers1 = translateFingers1*-1.0;
-	}else if (delta % 2020 == 0) {
-		rotateFingers2 = rotateFingers2*-1.0;
-		translateFingers2 = translateFingers2*-1.0;
-	}
-
-	_myDephtbuffer.Bind();
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//Render de Sombras - 1er Render
-	program2.Activate();
-	//Piso
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection() * _transformFloor.GetModelMatrix());
-	_meshPalm.Draw(GL_TRIANGLES);
-	//Palma
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection() * _transformPalm.GetModelMatrix());
-	_meshPalm.Draw(GL_TRIANGLES);
-	//Fingers
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix()* _transformF1A.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix() *_transformF1A.GetModelMatrix()* _transformF1B.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix()* _transformF2A.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF2A.GetModelMatrix()* _transformF2B.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix() * _transformF3A.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF3A.GetModelMatrix()* _transformF3B.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix()* _transformF4A.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.SetUniformMatrix("mvpMatrix", _lightCamera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF4A.GetModelMatrix()* _transformF4B.GetModelMatrix());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2.Desactivate();
-
-	_myDephtbuffer.Unbind();
-	ReshapeWindow(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//Render Camara
-	program2Tex.Activate();
-
-	glActiveTexture(GL_TEXTURE0);
-	_back.Bind();
-	glActiveTexture(GL_TEXTURE1);
-	_logo.Bind();
-	glActiveTexture(GL_TEXTURE2);
-	_myDephtbuffer.BindDepthMap();
-
-	//Palm
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transformPalm.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshPalm.Draw(GL_TRIANGLES);
-
-	//Fingers
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix() * _transformF1A.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF1A.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()* _transformF1A.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix()* _transformF1A.GetModelMatrix() * _transformF1B.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF1A.GetModelMatrix()*_transformF1B.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF1A.GetModelMatrix()* _transformF1B.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix() * _transformF2A.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF2A.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()* _transformF2A.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix()*_transformF2A.GetModelMatrix() * _transformF2B.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF2A.GetModelMatrix()*_transformF2B.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF2A.GetModelMatrix()* _transformF2B.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix()* _transformF3A.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF3A.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() *_transformPalm.GetModelMatrix()* _transformF3A.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix()* _transformF3A.GetModelMatrix() * _transformF3B.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF3A.GetModelMatrix()*_transformF3B.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF3A.GetModelMatrix()* _transformF3B.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix() * _transformF4A.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF4A.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()* _transformF4A.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-	
-	program2Tex.SetUniformMatrix("modelMatrix", _transformPalm.GetModelMatrix()* _transformF4A.GetModelMatrix() * _transformF4B.GetModelMatrix());
-	program2Tex.SetUniformMatrix3("normalMatrix", transpose(inverse(mat3(_transformPalm.GetModelMatrix()*_transformF4A.GetModelMatrix()*_transformF4B.GetModelMatrix()))));
-	program2Tex.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection()*_transformPalm.GetModelMatrix()*_transformF4A.GetModelMatrix()* _transformF4B.GetModelMatrix());
-	program2Tex.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-	_meshFingers.Draw(GL_TRIANGLES);
-
-	glActiveTexture(GL_TEXTURE0);
-	_back.Unbind();
-	glActiveTexture(GL_TEXTURE1);
-	_logo.Unbind();
-	glActiveTexture(GL_TEXTURE2);
-	_myDephtbuffer.UnbindDepthMap();
-	program2Tex.Desactivate();
-
-	program.Activate();
-	glActiveTexture(GL_TEXTURE0);
-	_floor.Bind();
-	glActiveTexture(GL_TEXTURE2);
-	_myDephtbuffer.BindDepthMap();
-	
-	mat3 normalMatrix2 = transpose(inverse(mat3(_transformFloor.GetModelMatrix())));
-	program.SetUniformMatrix("modelMatrix", _transformFloor.GetModelMatrix());
-	program.SetUniformMatrix3("normalMatrix", normalMatrix2);
-	program.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transformFloor.GetModelMatrix());
-	program.SetUniformMatrix("LightVPMatrix", _lightCamera.GetViewProjection());
-
-	_meshPalm.Draw(GL_TRIANGLES);
-	glActiveTexture(GL_TEXTURE0);
-	_floor.Unbind();
-	glActiveTexture(GL_TEXTURE2);
-	_myDephtbuffer.UnbindDepthMap();
-	program.Desactivate();
-
-	//Cuando terminamos de renderear, cambiamp los buffers
-	glutSwapBuffers();
-}
-
-
-
-void Idle(){
+void Idle()
+{
 	//Cuando opengl entra ne modo de reposo le decimos que vuelva a llamar el gameloop 
 	glutPostRedisplay();
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[])
+{
 	//inicializa freglut
 	//este crea ventana
 	//en donde se dibuja
@@ -566,7 +879,7 @@ int main(int argc, char* argv[]){
 	//INICIA EL CONTEXTO DE OPENGL; ESTO SON SUS CAPACIDADES GRAFICAS
 	//En este caso se usa pipeline Programable
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-	//SOLICITANDO VERSION 4.2 DE GL 
+	//SOLICITANDO VERSION 4.4 DE GL 
 	glutInitContextVersion(4, 2);
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 	//freeglut nos permite configurar eventos que ocurren en la ventana
@@ -591,7 +904,7 @@ int main(int argc, char* argv[]){
 
 	//Config OpenGL
 	//este es el color por default en el buffer del color
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	//borrado de caras traseras, todos los triangulos CCW

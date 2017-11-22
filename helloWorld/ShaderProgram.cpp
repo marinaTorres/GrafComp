@@ -71,7 +71,7 @@ void ShaderProgram::Activate(){
 	glUseProgram(_programHandle);
 }
 
-void ShaderProgram::Desactivate(){
+void ShaderProgram::Deactivate(){
 	// Desactivamos el manager shaderProgram
 	glUseProgram(0);
 }

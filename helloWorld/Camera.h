@@ -32,7 +32,7 @@ public:
 	//Que tan cerca y que tan lejos va a ver en el plano del corte,
 	//
 	void SetPerspective(float nearPlane, float farPlane, float fieldOfView, float aspectRatio);
-	void SetOrthographic(float sixe, float aspectRatio);
+	void SetOrtographic(float sixe, float aspectRatio);
 
 private:
 	Transform _transform;
