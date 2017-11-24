@@ -264,9 +264,9 @@ void Initialize()
 	vec3 lSource = lPos;
 
 	//textura
-	myTexture.LoadTexture("colors.jpg");
-	base.LoadTexture("cubo_morado.jpg");
-	cerdo.LoadTexture("Paramore_Logo.png");
+	myTexture.LoadTexture("caja.jpg");
+	base.LoadTexture("base.jpg");
+	cerdo.LoadTexture("crash.png");
 
 	//queremos generar un manager
 	geometria1.CreateMesh((GLint)ULTRA);
